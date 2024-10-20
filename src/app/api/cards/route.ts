@@ -1,17 +1,23 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
+
+const studentId: number | undefined = 1;
 
 export async function POST(request: Request) {
-  const res: number = await request.json();
-
   try {
-    await prisma.card.create({
-      data: {
-        rfid: res,
+    const res = await request.text();
+
+    const data: Prisma.CardCreateInput = {
+      rfid: res,
+      student: {
+        connect: { id: studentId },
       },
-    });
+    };
+
+    await prisma.card.create({ data });
+
+    return Response.json({ data: res });
   } catch (error) {
     return Response.json(error, { status: 500 });
   }
-
-  return Response.json({ data: res });
 }

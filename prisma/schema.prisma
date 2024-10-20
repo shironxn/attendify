@@ -41,7 +41,7 @@ model Attendance {
   studentId   Int      @map("student_id")
   reader      Reader   @relation(fields: [readerId], references: [id])
   readerId    Int      @map("reader_id")
-  status      Status
+  status      Status   @default(HADIR)
   description String?
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -49,7 +49,7 @@ model Attendance {
 
 model Card {
   id        Int      @id @default(autoincrement())
-  rfid      Int      @unique
+  rfid      String   @unique
   student   Student  @relation(fields: [studentId], references: [id])
   studentId Int      @unique @map("student_id")
   createdAt DateTime @default(now()) @map("created_at")
@@ -70,7 +70,7 @@ model Reader {
   userId      Int          @map("user_id")
   name        String       @unique
   location    String
-  mode        Mode
+  mode        Mode         @default(INACTIVE)
   createdAt   DateTime     @default(now()) @map("created_at")
   updatedAt   DateTime     @updatedAt @map("updated_at")
   attendances Attendance[]
