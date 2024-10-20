@@ -29,7 +29,7 @@ model Student {
   class      Class
   createdAt  DateTime     @default(now()) @map("created_at")
   updatedAt  DateTime     @updatedAt @map("updated_at")
-  rfidCard   RFIDCard?
+  rfidCard   Card?
   attendance Attendance[]
   points     Point[]
 }
@@ -44,13 +44,13 @@ model Attendance {
   updatedAt   DateTime @updatedAt @map("updated_at")
 }
 
-model RFIDCard {
-  id         Int      @id @default(autoincrement())
-  cardNumber String   @unique @map("card_number")
-  student    Student  @relation(fields: [studentId], references: [id])
-  studentId  Int      @unique @map("student_id")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+model Card {
+  id        Int      @id @default(autoincrement())
+  rfid      String   @unique
+  student   Student  @relation(fields: [studentId], references: [id])
+  studentId Int      @unique @map("student_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 }
 
 model Point {
