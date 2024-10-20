@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model Student {
+  id         Int          @id @default(autoincrement())
+  name       String
+  nis        Int          @unique
+  class      Class
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+  rfidCard   RFIDCard?
+  attendance Attendance[]
+  points     Point[]
+}
+
+model Attendance {
+  id          Int      @id @default(autoincrement())
+  student     Student  @relation(fields: [studentId], references: [id])
+  studentId   Int      @map("student_id")
+  status      Status
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+}
+
+model RFIDCard {
+  id         Int      @id @default(autoincrement())
+  cardNumber String   @unique @map("card_number")
+  student    Student  @relation(fields: [studentId], references: [id])
+  studentId  Int      @unique @map("student_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+}
+
+model Point {
+  id        Int      @id @default(autoincrement())
+  student   Student  @relation(fields: [studentId], references: [id])
+  studentId Int      @map("student_id")
+  value     Int
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+enum Status {
+  HADIR
+  IZIN
+  DISPEN
+  SAKIT
+  ALFA
+  PULANG
+}
+
+enum Class {
+  XI5
+}
