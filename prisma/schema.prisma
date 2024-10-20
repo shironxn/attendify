@@ -20,24 +20,27 @@ model User {
   password  String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  readers   Reader[]
 }
 
 model Student {
-  id         Int          @id @default(autoincrement())
-  name       String
-  nis        Int          @unique
-  class      Class
-  createdAt  DateTime     @default(now()) @map("created_at")
-  updatedAt  DateTime     @updatedAt @map("updated_at")
-  card       Card?
-  attendance Attendance[]
-  points     Point[]
+  id          Int          @id @default(autoincrement())
+  name        String
+  nis         Int          @unique
+  class       Class
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  card        Card?
+  attendances Attendance[]
+  points      Point[]
 }
 
 model Attendance {
   id          Int      @id @default(autoincrement())
   student     Student  @relation(fields: [studentId], references: [id])
   studentId   Int      @map("student_id")
+  reader      Reader   @relation(fields: [readerId], references: [id])
+  readerId    Int      @map("reader_id")
   status      Status
   description String?
   createdAt   DateTime @default(now()) @map("created_at")
@@ -61,6 +64,18 @@ model Point {
   createdAt DateTime @default(now()) @map("created_at")
 }
 
+model Reader {
+  id          Int          @id @default(autoincrement())
+  user        User         @relation(fields: [userId], references: [id])
+  userId      Int          @map("user_id")
+  name        String       @unique
+  location    String
+  mode        Mode
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  attendances Attendance[]
+}
+
 enum Status {
   HADIR
   IZIN
@@ -72,4 +87,10 @@ enum Status {
 
 enum Class {
   XI5
+}
+
+enum Mode {
+  ACTIVE
+  INACTIVE
+  ADD
 }
