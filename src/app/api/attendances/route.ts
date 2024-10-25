@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { Status } from "@prisma/client";
 import djs from "@/lib/dayjs";
+import { truncate } from "fs";
 
 export async function POST(request: Request) {
   try {
@@ -8,7 +9,7 @@ export async function POST(request: Request) {
     const res = await request.json();
     const now = djs();
     const lateTime = now.hour(6).minute(30);
-    const exitTime = now.hour(15);
+    const exitTime = now.hour(17);
 
     const todaysAttendance = await prisma.attendance.findMany({
       where: {
@@ -62,9 +63,15 @@ export async function POST(request: Request) {
         },
         status: status,
       },
+      include: {
+        student: true,
+      },
     });
 
-    return Response.json({ data }, { status: 201 });
+    return Response.json(
+      { message: "Berhasil melakukan presensi.", data },
+      { status: 201 },
+    );
   } catch (error) {
     return Response.json(error, { status: 500 });
   }
