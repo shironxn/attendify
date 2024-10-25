@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -21,6 +15,8 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   readers   Reader[]
+
+  @@map("users")
 }
 
 model Student {
@@ -30,43 +26,50 @@ model Student {
   class       Class
   createdAt   DateTime     @default(now()) @map("created_at")
   updatedAt   DateTime     @updatedAt @map("updated_at")
-  card        Card?
   attendances Attendance[]
+  card        Card?
   points      Point[]
+
+  @@map("students")
 }
 
 model Attendance {
   id          Int      @id @default(autoincrement())
-  student     Student  @relation(fields: [studentId], references: [id])
   studentId   Int      @map("student_id")
-  reader      Reader   @relation(fields: [readerId], references: [id])
   readerId    Int      @map("reader_id")
   status      Status   @default(HADIR)
   description String?
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
+  reader      Reader   @relation(fields: [readerId], references: [id])
+  student     Student  @relation(fields: [studentId], references: [id])
+
+  @@map("attendances")
 }
 
 model Card {
   id        Int      @id @default(autoincrement())
   rfid      String   @unique
-  student   Student  @relation(fields: [studentId], references: [id])
   studentId Int      @unique @map("student_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  student   Student  @relation(fields: [studentId], references: [id])
+
+  @@map("cards")
 }
 
 model Point {
   id        Int      @id @default(autoincrement())
-  student   Student  @relation(fields: [studentId], references: [id])
   studentId Int      @map("student_id")
   value     Int
   createdAt DateTime @default(now()) @map("created_at")
+  student   Student  @relation(fields: [studentId], references: [id])
+
+  @@map("points")
 }
 
 model Reader {
   id          Int          @id @default(autoincrement())
-  user        User         @relation(fields: [userId], references: [id])
   userId      Int          @map("user_id")
   name        String       @unique
   location    String
@@ -74,10 +77,14 @@ model Reader {
   createdAt   DateTime     @default(now()) @map("created_at")
   updatedAt   DateTime     @updatedAt @map("updated_at")
   attendances Attendance[]
+  user        User         @relation(fields: [userId], references: [id])
+
+  @@map("readers")
 }
 
 enum Status {
   HADIR
+  TELAT
   IZIN
   DISPEN
   SAKIT
