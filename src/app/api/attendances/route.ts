@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { Status } from "@prisma/client";
 import djs from "@/lib/dayjs";
-import { truncate } from "fs";
 
 export async function POST(request: Request) {
   try {

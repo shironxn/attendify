@@ -18,6 +18,7 @@ import {
   SunIcon,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import { DashboardIcon } from "@radix-ui/react-icons";
 
 export function Navbar() {
   const { theme, setTheme } = useTheme()
@@ -44,7 +45,6 @@ export function Navbar() {
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuLabel>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
                   <Link href={"/"}>
                     <DropdownMenuItem>
                       Home
@@ -53,6 +53,15 @@ export function Navbar() {
                       </DropdownMenuShortcut>
                     </DropdownMenuItem>
                   </Link>
+                  <Link href={"/dashboard"}>
+                    <DropdownMenuItem>
+                      Dashboard
+                      <DropdownMenuShortcut>
+                        <DashboardIcon className="w-4 h-4" />
+                      </DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                  </Link>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => theme === "light" ? setTheme("dark") : setTheme("light")}>
                     Theme
                     <DropdownMenuShortcut>

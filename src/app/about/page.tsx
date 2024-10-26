@@ -1,7 +1,6 @@
 import { CircleArrowRight, Files, Settings } from 'lucide-react';
 import Image from 'next/image';
 
-
 export default function About() {
   return (
     <section className="py-32">
