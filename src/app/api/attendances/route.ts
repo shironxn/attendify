@@ -12,8 +12,8 @@ export async function POST(request: Request) {
 
     const todaysAttendance = await prisma.attendance.findMany({
       where: {
-        student: { id: res.student_id },
-        reader: { id: res.reader_id },
+        studentId: res.student_id,
+        readerId: res.reader_id,
         createdAt: {
           gte: now.startOf("day").toDate(),
           lt: now.endOf("day").toDate(),
