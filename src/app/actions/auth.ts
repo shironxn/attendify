@@ -58,3 +58,19 @@ export async function RegisterWithEmail(formData: Register) {
 
   redirect("/login");
 }
+
+export async function Logout() {
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      return { message: error.message };
+    }
+  } catch (error) {
+    console.error("Logout Exception:", error);
+    return { message: "An unexpected error occurred during logout." };
+  }
+
+  redirect("/");
+}

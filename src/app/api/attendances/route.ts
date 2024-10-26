@@ -5,7 +5,7 @@ import djs from "@/lib/dayjs";
 export async function POST(request: Request) {
   try {
     let status: Status = "HADIR";
-    const res = await request.json();
+    const res: { student_id: number; reader_id: number } = await request.json();
     const now = djs();
     const lateTime = now.hour(6).minute(30);
     const exitTime = now.hour(17);

@@ -19,61 +19,66 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { DashboardIcon } from "@radix-ui/react-icons";
+import { usePathname } from "next/navigation";
 
 export function Navbar() {
   const { theme, setTheme } = useTheme()
+  const pathname = usePathname()
   return (
     <>
-      <header className="w-full fixed">
-        <nav className="flex justify-between p-5 items-center">
-          <Link href={"/"} className="text-lg font-extrabold md:text-base">
-            A.
-          </Link>
+      {pathname !== "/dashboard"
+        &&
 
-          <div className="flex items-center gap-2">
-            <div>
-              <DropdownMenu >
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="overflow-hidden"
-                  >
-                    <MenuIcon className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuLabel>
-                  </DropdownMenuLabel>
-                  <Link href={"/"}>
-                    <DropdownMenuItem>
-                      Home
+        <header className="w-full fixed">
+          <nav className="flex justify-between p-5 items-center">
+            <Link href={"/"} className="text-lg font-extrabold md:text-base">
+              A.
+            </Link>
+
+            <div className="flex items-center gap-2">
+              <div>
+                <DropdownMenu >
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="overflow-hidden"
+                    >
+                      <MenuIcon className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuLabel>
+                    </DropdownMenuLabel>
+                    <Link href={"/"}>
+                      <DropdownMenuItem>
+                        Home
+                        <DropdownMenuShortcut>
+                          <HomeIcon className="w-4 h-4" />
+                        </DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href={"/dashboard"}>
+                      <DropdownMenuItem>
+                        Dashboard
+                        <DropdownMenuShortcut>
+                          <DashboardIcon className="w-4 h-4" />
+                        </DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => theme === "light" ? setTheme("dark") : setTheme("light")}>
+                      Theme
                       <DropdownMenuShortcut>
-                        <HomeIcon className="w-4 h-4" />
+                        {theme === "light" ? <SunIcon className="w-4 h-4" /> : <MoonIcon className="w-4 h-4" />}
                       </DropdownMenuShortcut>
                     </DropdownMenuItem>
-                  </Link>
-                  <Link href={"/dashboard"}>
-                    <DropdownMenuItem>
-                      Dashboard
-                      <DropdownMenuShortcut>
-                        <DashboardIcon className="w-4 h-4" />
-                      </DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                  </Link>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => theme === "light" ? setTheme("dark") : setTheme("light")}>
-                    Theme
-                    <DropdownMenuShortcut>
-                      {theme === "light" ? <SunIcon className="w-4 h-4" /> : <MoonIcon className="w-4 h-4" />}
-                    </DropdownMenuShortcut>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
-          </div>
-        </nav>
-      </header>
-    </>
+          </nav>
+        </header>
+      }</>
   );
 }
