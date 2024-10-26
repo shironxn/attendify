@@ -1,12 +1,13 @@
 import { prisma } from "@/lib/prisma";
 
 export async function GET(
-  _: Request,
-  { params }: { params: { slug: string } },
+  request: Request,
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   try {
+    const slug = (await params).slug;
     const data = await prisma.card.findUnique({
-      where: { rfid: params.slug },
+      where: { rfid: slug },
     });
 
     return Response.json({ data: data });
