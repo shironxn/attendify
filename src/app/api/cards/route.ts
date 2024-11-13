@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     const res = await request.text();
 
     const data: Prisma.CardCreateInput = {
-      rfid: res,
+      rfid: Number(res),
       student: {
         connect: { id: studentId },
       },

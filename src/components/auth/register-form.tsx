@@ -1,7 +1,7 @@
-'use client'
+"use client"
 
 import { Button } from "@/components/ui/button"
-import { AuthWithGoogle, RegisterWithEmail } from "@/app/actions/auth"
+import { register } from "@/app/actions/auth"
 import { RegisterSchema, Register } from "@/lib/types"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -17,6 +17,12 @@ import { Input } from "../ui/input"
 import { useToast } from "@/hooks/use-toast"
 
 const inputField = [
+  {
+    name: "name",
+    type: "text",
+    label: "Name",
+    placeholder: ""
+  },
   {
     name: "email",
     type: "email",
@@ -35,14 +41,19 @@ export function RegisterForm() {
   const { toast } = useToast()
   const form = useForm<Register>({
     resolver: zodResolver(RegisterSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
   })
 
   const onSubmit = async (data: Register) => {
-    const res = await RegisterWithEmail(data)
-    if (res?.message) {
+    const res = await register(data)
+    if (res?.error) {
       toast({
-        title: "",
-        description: res.message
+        title: "Error",
+        description: res.error
       })
     }
   }
@@ -54,7 +65,7 @@ export function RegisterForm() {
           <FormField
             key={index}
             control={form.control}
-            name={item.name as "email" || "password"}
+            name={item.name as "name" || "email" || "password"}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{item.label}</FormLabel>
@@ -68,9 +79,6 @@ export function RegisterForm() {
         ))}
         <Button type="submit" className="w-full">
           Register
-        </Button>
-        <Button variant="outline" type="button" className="w-full" onClick={() => AuthWithGoogle()}>
-          Register with Google
         </Button>
       </form>
     </Form>

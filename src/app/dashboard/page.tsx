@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/app-sidebar"
+import { AppSidebar } from "@/components/dashboard/app-sidebar"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,38 +13,43 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { getAuth } from "../actions/auth"
+import { MonitorSection } from "@/components/dashboard/sections/monitor"
 
-export default function Page() {
+export default async function Dashboard(props: { searchParams?: Promise<{ section?: string }> }) {
+  const searchParams = await props.searchParams
+  const section = searchParams?.section
+
+  const user = await getAuth()
+
   return (
     <SidebarProvider>
-      <AppSidebar />
+      {user.data && <AppSidebar user={user.data} />}
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2">
+        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
+                  <BreadcrumbLink href="/dashboard">
+                    Dashboard
                   </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
+                {section &&
+                  <>
+                    <BreadcrumbSeparator className="hidden md:block" />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>{section.charAt(0).toUpperCase() + section.slice(1)}</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </>}
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="aspect-video rounded-xl bg-muted/50" />
-            <div className="aspect-video rounded-xl bg-muted/50" />
-            <div className="aspect-video rounded-xl bg-muted/50" />
-          </div>
-          <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
+          {section === "monitor" && <MonitorSection />}
         </div>
       </SidebarInset>
     </SidebarProvider>

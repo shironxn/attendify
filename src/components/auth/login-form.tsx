@@ -1,7 +1,7 @@
-'use client'
+"use client"
 
 import { Button } from "@/components/ui/button"
-import { AuthWithGoogle, LoginWithEmail } from "@/app/actions/auth"
+import { login } from "@/app/actions/auth"
 import { LoginSchema, Login } from "@/lib/types"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -35,14 +35,18 @@ export function LoginForm() {
   const { toast } = useToast()
   const form = useForm<Login>({
     resolver: zodResolver(LoginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   })
 
   const onSubmit = async (data: Login) => {
-    const res = await LoginWithEmail(data)
-    if (res?.message) {
+    const res = await login(data)
+    if (res?.error) {
       toast({
-        title: "",
-        description: res.message
+        title: "Error",
+        description: res.error
       })
     }
   }
@@ -68,9 +72,6 @@ export function LoginForm() {
         ))}
         <Button type="submit" className="w-full">
           Login
-        </Button>
-        <Button variant="outline" type="button" className="w-full" onClick={() => AuthWithGoogle()}>
-          Login with Google
         </Button>
       </form>
     </Form>

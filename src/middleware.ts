@@ -1,8 +1,23 @@
-import { type NextRequest } from "next/server";
-import { updateSession } from "@/lib/supabase/middleware";
+import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  return await updateSession(request);
+  if (
+    request.nextUrl.pathname.startsWith("/login") ||
+    request.nextUrl.pathname.startsWith("/register")
+  ) {
+    if (request.cookies.has("token")) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  }
+
+  if (
+    !request.cookies.has("token") &&
+    request.nextUrl.pathname === "/dashboard"
+  ) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {

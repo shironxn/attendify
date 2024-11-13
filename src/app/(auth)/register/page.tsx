@@ -13,7 +13,7 @@ export default function Register() {
     <div className="flex h-screen w-full items-center justify-center px-4">
       <Card className="mx-auto max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">Register</CardTitle>
+          <CardTitle>Register</CardTitle>
           <CardDescription>
             Enter your email below to register to your account
           </CardDescription>

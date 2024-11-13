@@ -1,10 +1,9 @@
 "use client"
 
+import Link from "next/link"
 import {
-  BadgeCheck,
-  Bell,
   ChevronsUpDown,
-  CreditCard,
+  HomeIcon,
   LogOut,
   Sparkles,
 } from "lucide-react"
@@ -29,7 +28,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { Logout } from "@/app/actions/auth"
+import { logout } from "@/app/actions/auth"
+import { ToggleTheme } from "../nav/theme-toggle"
+import { DashboardIcon } from "@radix-ui/react-icons"
 
 export function NavUser({
   user,
@@ -82,28 +83,16 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
+              <Link href={"/"}>
+                <DropdownMenuItem>
+                  <HomeIcon />
+                  Home
+                </DropdownMenuItem>
+              </Link>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => Logout()}>
+            <ToggleTheme />
+            <DropdownMenuItem onClick={() => logout()}>
               <LogOut />
               Log out
             </DropdownMenuItem>

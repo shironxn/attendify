@@ -5,14 +5,27 @@ import djs from "@/lib/dayjs";
 export async function POST(request: Request) {
   try {
     let status: Status = "HADIR";
-    const res: { student_id: number; reader_id: number } = await request.json();
+    const res: { rfid: number; reader_id: number } = await request.json();
     const now = djs();
     const lateTime = now.hour(6).minute(30);
-    const exitTime = now.hour(17);
+    const exitTime = now.hour(15);
+
+    const card = await prisma.card.findUnique({
+      where: { rfid: res.rfid },
+      include: { student: true },
+    });
+
+    if (!card || !card.student) {
+      return Response.json(`Kartu tidak terdaftar, ID: ${res.rfid}`, {
+        status: 404,
+      });
+    }
+
+    const studentName = card.student.name;
 
     const todaysAttendance = await prisma.attendance.findMany({
       where: {
-        studentId: res.student_id,
+        studentId: card.studentId,
         readerId: res.reader_id,
         createdAt: {
           gte: now.startOf("day").toDate(),
@@ -28,34 +41,53 @@ export async function POST(request: Request) {
       (item) => item.status === "PULANG",
     );
 
-    if (now.isAfter(exitTime)) {
+    if (now.isSameOrAfter(exitTime)) {
+      status = "PULANG";
       if (hasCheckedOut) {
         return Response.json(
-          { error: "Anda sudah melakukan presensi pulang hari ini." },
-          { status: 400 },
+          {
+            data: {
+              name: studentName,
+              status,
+            },
+          },
+          { status: 409 },
         );
       }
       if (!hasCheckedIn) {
         return Response.json(
-          { error: "Anda belum melakukan presensi masuk hari ini." },
-          { status: 400 },
+          {
+            data: {
+              name: studentName,
+              status,
+            },
+          },
+          {
+            status: 400,
+          },
         );
       }
-      status = "PULANG";
     } else {
+      status = now.isAfter(lateTime) ? "TELAT" : "HADIR";
       if (hasCheckedIn) {
         return Response.json(
-          { error: "Anda sudah melakukan presensi masuk hari ini." },
-          { status: 400 },
+          {
+            data: {
+              name: studentName,
+              status,
+            },
+          },
+          {
+            status: 409,
+          },
         );
       }
-      status = now.isAfter(lateTime) ? "TELAT" : "HADIR";
     }
 
-    const data = await prisma.attendance.create({
+    await prisma.attendance.create({
       data: {
         student: {
-          connect: { id: res.student_id },
+          connect: { id: card.studentId },
         },
         reader: {
           connect: { id: res.reader_id },
@@ -68,10 +100,15 @@ export async function POST(request: Request) {
     });
 
     return Response.json(
-      { message: "Berhasil melakukan presensi.", data },
+      {
+        data: {
+          name: studentName,
+          status,
+        },
+      },
       { status: 201 },
     );
   } catch (error) {
-    return Response.json(error, { status: 500 });
+    return Response.json("Terjadi error!", { status: 500 });
   }
 }

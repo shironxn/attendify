@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -29,7 +28,6 @@ model Student {
   updatedAt   DateTime     @updatedAt @map("updated_at")
   attendances Attendance[]
   card        Card?
-  points      Point[]
 
   @@map("students")
 }
@@ -50,23 +48,13 @@ model Attendance {
 
 model Card {
   id        Int      @id @default(autoincrement())
-  rfid      String   @unique
+  rfid      BigInt   @unique
   studentId Int      @unique @map("student_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   student   Student  @relation(fields: [studentId], references: [id])
 
   @@map("cards")
-}
-
-model Point {
-  id        Int      @id @default(autoincrement())
-  studentId Int      @map("student_id")
-  value     Int
-  createdAt DateTime @default(now()) @map("created_at")
-  student   Student  @relation(fields: [studentId], references: [id])
-
-  @@map("points")
 }
 
 model Reader {

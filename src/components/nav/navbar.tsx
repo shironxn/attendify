@@ -1,34 +1,27 @@
-"use client";
+"use client"
 
 import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import {
   HomeIcon,
   MenuIcon,
-  MoonIcon,
-  SunIcon,
 } from "lucide-react";
-import { useTheme } from "next-themes";
 import { DashboardIcon } from "@radix-ui/react-icons";
 import { usePathname } from "next/navigation";
+import { ToggleTheme } from "./theme-toggle";
 
 export function Navbar() {
-  const { theme, setTheme } = useTheme()
   const pathname = usePathname()
   return (
     <>
-      {pathname !== "/dashboard"
-        &&
-
+      {pathname !== "/dashboard" &&
         <header className="w-full fixed">
           <nav className="flex justify-between p-5 items-center">
             <Link href={"/"} className="text-lg font-extrabold md:text-base">
@@ -44,35 +37,24 @@ export function Navbar() {
                       size="icon"
                       className="overflow-hidden"
                     >
-                      <MenuIcon className="w-4 h-4" />
+                      <MenuIcon />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuLabel>
-                    </DropdownMenuLabel>
                     <Link href={"/"}>
                       <DropdownMenuItem>
+                        <HomeIcon />
                         Home
-                        <DropdownMenuShortcut>
-                          <HomeIcon className="w-4 h-4" />
-                        </DropdownMenuShortcut>
                       </DropdownMenuItem>
                     </Link>
                     <Link href={"/dashboard"}>
                       <DropdownMenuItem>
+                        <DashboardIcon />
                         Dashboard
-                        <DropdownMenuShortcut>
-                          <DashboardIcon className="w-4 h-4" />
-                        </DropdownMenuShortcut>
                       </DropdownMenuItem>
                     </Link>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => theme === "light" ? setTheme("dark") : setTheme("light")}>
-                      Theme
-                      <DropdownMenuShortcut>
-                        {theme === "light" ? <SunIcon className="w-4 h-4" /> : <MoonIcon className="w-4 h-4" />}
-                      </DropdownMenuShortcut>
-                    </DropdownMenuItem>
+                    <ToggleTheme />
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
