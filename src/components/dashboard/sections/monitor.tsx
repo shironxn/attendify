@@ -18,7 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { ChevronLeftIcon, ChevronRightIcon, ChevronsLeftIcon, ChevronsRightIcon, UserCheckIcon, UserMinusIcon, UserPenIcon, UserXIcon } from "lucide-react"
+import { ChevronLeftIcon, ChevronRightIcon, ChevronsLeftIcon, ChevronsRightIcon, LogOutIcon, UserCheckIcon, UserMinusIcon, UserXIcon } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -35,7 +35,30 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
-
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 type AttendanceWithStudent = Prisma.AttendanceGetPayload<{
   include: { student: true };
@@ -49,39 +72,20 @@ const cards = [
   },
   {
     title: "Telat",
-    icon: UserCheckIcon,
-    content: 0
-  },
-  {
-    title: "Izin",
-    icon: UserCheckIcon,
-    content: 0
-  },
-  {
-    title: "Dispen",
-    icon: UserCheckIcon,
-    content: 0
-  },
-  {
-    title: "Sakit",
     icon: UserMinusIcon,
     content: 0
   },
   {
-    title: "Alfa",
+    title: "Tidak Hadir",
     icon: UserXIcon,
     content: 0
   },
   {
     title: "Pulang",
-    icon: UserPenIcon,
+    icon: LogOutIcon,
     content: 0
   },
-  {
-    title: "Total",
-    icon: UserPenIcon,
-    content: 0
-  },
+
 ]
 
 const statusList: Status[] = ["HADIR", "TELAT", "IZIN", "DISPEN", "SAKIT", "ALFA", "PULANG"]
@@ -98,6 +102,10 @@ export function MonitorSection() {
   const [sizePage, setSizePage] = useState(10)
   const [totalPage, setTotalPage] = useState(10)
 
+  const [openView, setOpenView] = useState<number | boolean | null>(null);
+  const [openEdit, setOpenEdit] = useState<number | boolean | null>(null);
+  const [openDelete, setOpenDelete] = useState<number | boolean | null>(null);
+
   useEffect(() => {
     const interval = setInterval(() => {
       getAttendance().then(data => {
@@ -106,7 +114,6 @@ export function MonitorSection() {
 
         cards.forEach(item => item.content = 0)
         data.filter(item => djs().isSame(item.createdAt, "day")).forEach(item => {
-          cards[7].content += 1
           switch (item.status) {
             case "HADIR":
               cards[0].content += 1
@@ -118,16 +125,16 @@ export function MonitorSection() {
               cards[2].content += 1
               break;
             case "DISPEN":
-              cards[3].content += 1
+              cards[0].content += 1
               break;
             case "SAKIT":
-              cards[4].content += 1
+              cards[2].content += 1
               break;
             case "ALFA":
-              cards[5].content += 1
+              cards[2].content += 1
               break;
             case "PULANG":
-              cards[6].content += 1
+              cards[3].content += 1
               break;
             default:
               break;
@@ -163,7 +170,7 @@ export function MonitorSection() {
 
   return (
     <div className="space-y-8">
-      <div className="grid gap-4 grid-rows-4 lg:grid-rows-2 grid-flow-col">
+      <div className="grid gap-4 lg:grid-cols-4">
         {cards.map((item, index) => (
           <Card key={index}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -204,27 +211,28 @@ export function MonitorSection() {
             <TableHead className="w-[100px]">ID</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Nama</TableHead>
+            <TableHead>Kelas</TableHead>
             <TableHead className="text-right">Waktu</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filteredData?.map((item, index) => (
-            //<ContextMenu key={index}>
-            //<ContextMenuTrigger >
-            <TableRow key={index}>
-              <TableCell className="font-medium">{item.id}</TableCell>
-              <TableCell>{item.status}</TableCell>
-              <TableCell>{item.student.name}</TableCell>
-              <TableCell className="text-right">{djs(item.createdAt).format("YYYY-MM-DD HH:mm:ss")}</TableCell>
-            </TableRow>
-            //  </ContextMenuTrigger>
-            //  <ContextMenuContent>
-            //    <ContextMenuItem>Profile</ContextMenuItem>
-            //    <ContextMenuItem>Billing</ContextMenuItem>
-            //    <ContextMenuItem>Team</ContextMenuItem>
-            //    <ContextMenuItem>Subscription</ContextMenuItem>
-            //  </ContextMenuContent>
-            //</ContextMenu>
+            <ContextMenu key={index}>
+              <ContextMenuTrigger asChild>
+                <TableRow key={index}>
+                  <TableCell className="font-medium">{item.id}</TableCell>
+                  <TableCell>{item.status}</TableCell>
+                  <TableCell>{item.student.name}</TableCell>
+                  <TableCell>{item.student.class}</TableCell>
+                  <TableCell className="text-right">{djs(item.createdAt).format("YYYY-MM-DD HH:mm:ss")}</TableCell>
+                </TableRow>
+              </ContextMenuTrigger>
+              <ContextMenuContent>
+                <ContextMenuItem onClick={() => setOpenView(item.id)}>View</ContextMenuItem>
+                <ContextMenuItem onClick={() => setOpenEdit(item.id)}>Edit</ContextMenuItem>
+                <ContextMenuItem onClick={() => setOpenDelete(item.id)}>Delete</ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
           ))}
         </TableBody>
       </Table>
@@ -259,9 +267,46 @@ export function MonitorSection() {
         </div>
       </div>
 
+      <Dialog open={openView !== null && openView !== false} onOpenChange={setOpenView}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Are you absolutely sure?</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. This will permanently delete your account
+              and remove your data from our servers.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
+      <Sheet open={openEdit !== null && openEdit !== false} onOpenChange={setOpenEdit}>
+        <SheetContent className="w-[400px] sm:w-[540px]">
+          <SheetHeader>
+            <SheetTitle>Are you absolutely sure?</SheetTitle>
+            <SheetDescription>
+              This action cannot be undone. This will permanently delete your account
+              and remove your data from our servers.
+            </SheetDescription>
+          </SheetHeader>
+        </SheetContent>
+      </Sheet>
 
 
-
+      <AlertDialog open={openDelete !== null && openDelete !== false} onOpenChange={setOpenDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your account
+              and remove your data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div >
   )
 }

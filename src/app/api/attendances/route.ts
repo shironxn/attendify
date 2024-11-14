@@ -16,12 +16,11 @@ export async function POST(request: Request) {
     });
 
     if (!card || !card.student) {
-      return Response.json(`Kartu tidak terdaftar, ID: ${res.rfid}`, {
-        status: 404,
-      });
+      return Response.json(
+        { message: `Kartu dengan ID: ${res.rfid} tidak terdaftar di sistem.` },
+        { status: 404 },
+      );
     }
-
-    const studentName = card.student.name;
 
     const todaysAttendance = await prisma.attendance.findMany({
       where: {
@@ -41,48 +40,47 @@ export async function POST(request: Request) {
       (item) => item.status === "PULANG",
     );
 
-    if (now.isSameOrAfter(exitTime)) {
-      status = "PULANG";
-      if (hasCheckedOut) {
-        return Response.json(
-          {
-            data: {
-              name: studentName,
-              status,
-            },
-          },
-          { status: 409 },
-        );
-      }
-      if (!hasCheckedIn) {
-        return Response.json(
-          {
-            data: {
-              name: studentName,
-              status,
-            },
-          },
-          {
-            status: 400,
-          },
-        );
-      }
-    } else {
-      status = now.isAfter(lateTime) ? "TELAT" : "HADIR";
-      if (hasCheckedIn) {
-        return Response.json(
-          {
-            data: {
-              name: studentName,
-              status,
-            },
-          },
-          {
-            status: 409,
-          },
-        );
-      }
-    }
+    //if (now.isSameOrAfter(exitTime)) {
+    //  status = "PULANG";
+    //  if (hasCheckedOut) {
+    //    return Response.json(
+    //      {
+    //        message: `Presensi pulang sudah tercatat untuk ${studentName}.`,
+    //        data: {
+    //          name: studentName,
+    //          status,
+    //        },
+    //      },
+    //      { status: 409 },
+    //    );
+    //  }
+    //  if (!hasCheckedIn) {
+    //    return Response.json(
+    //      {
+    //        message: `Presensi masuk belum tercatat untuk ${studentName}. Tidak dapat melakukan presensi pulang.`,
+    //        data: {
+    //          name: studentName,
+    //          status,
+    //        },
+    //      },
+    //      { status: 400 },
+    //    );
+    //  }
+    //} else {
+    //  status = now.isAfter(lateTime) ? "TELAT" : "HADIR";
+    //  if (hasCheckedIn) {
+    //    return Response.json(
+    //      {
+    //        message: `Presensi sudah tercatat untuk ${studentName}. Tidak dapat melakukan presensi lagi.`,
+    //        data: {
+    //          name: studentName,
+    //          status,
+    //        },
+    //      },
+    //      { status: 409 },
+    //    );
+    //  }
+    //}
 
     await prisma.attendance.create({
       data: {
@@ -99,16 +97,35 @@ export async function POST(request: Request) {
       },
     });
 
+    //const payload = {
+    //  chatId: `${card.student.phone_number}@c.us`,
+    //  message: `Anak anda ${card.student.name} sudah ${status.toLowerCase()} sekolah`,
+    //};
+    //await fetch(String(process.env.NEXT_PUBLIC_WHATSAPP_API_URL), {
+    //  method: "POST",
+    //  headers: {
+    //    "Content-Type": "application/json",
+    //  },
+    //  body: JSON.stringify(payload),
+    //});
+
     return Response.json(
       {
+        message: `Presensi berhasil tercatat untuk ${card.student.name} dengan status ${status.toLowerCase()}.`,
         data: {
-          name: studentName,
+          name: card.student.name,
           status,
         },
       },
       { status: 201 },
     );
   } catch (error) {
-    return Response.json("Terjadi error!", { status: 500 });
+    if (error instanceof Error) {
+      console.log(error.message);
+    }
+    return Response.json(
+      { message: "Terjadi kesalahan pada server. Silakan coba lagi nanti." },
+      { status: 500 },
+    );
   }
 }
