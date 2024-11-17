@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import djs from "@/lib/dayjs";
 import { compare, hash } from "bcrypt-ts";
 import * as jose from "jose";
+import { Prisma } from "@prisma/client";
 
 export async function getAuth() {
   try {
@@ -21,19 +22,15 @@ export async function getAuth() {
       where: { id: id },
     });
 
-    return {
-      data,
-    };
+    return { data };
   } catch (error) {
-    console.log(error);
-    if (error instanceof Error) {
-      return {
-        error: error.message,
-      };
+    console.error("Unexpected error in getAuth:", error);
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return { error: error.message };
     }
-    return {
-      error: "An unexpected error occurred",
-    };
+
+    return { error: "An unexpected error occurred while fetching auth data" };
   }
 }
 
@@ -55,26 +52,25 @@ export async function login(data: Login) {
     const token = await new jose.SignJWT({ id: user.id })
       .setProtectedHeader({ alg: "HS256" })
       .setIssuedAt()
-      .setExpirationTime("2h")
+      .setExpirationTime("8h")
       .sign(secret);
 
     cookie.set({
       name: "token",
       value: token,
-      expires: djs().add(1, "hour").toDate(),
+      expires: djs().add(8, "hour").toDate(),
       path: "/",
       httpOnly: true,
       sameSite: "strict",
     });
   } catch (error) {
-    if (error instanceof Error) {
-      return {
-        error: error.message,
-      };
+    console.error("Unexpected error in login:", error);
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return { error: error.message };
     }
-    return {
-      error: "An unexpected error occurred",
-    };
+
+    return { error: "An unexpected error occurred while logging in" };
   }
 
   redirect("/dashboard");
@@ -85,15 +81,15 @@ export async function register(data: Register) {
     data.password = await hash(data.password, 10);
     await prisma.user.create({ data });
   } catch (error) {
-    if (error instanceof Error) {
-      return {
-        error: error.message,
-      };
+    console.error("Unexpected error in register:", error);
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return { error: error.message };
     }
-    return {
-      error: "An unexpected error occurred",
-    };
+
+    return { error: "An unexpected error occurred during registration" };
   }
+
   redirect("/login");
 }
 
@@ -102,15 +98,19 @@ export async function logout() {
     const cookie = await cookies();
     if (!cookie.has("token")) {
       return {
-        error: "token not foundd",
+        error: "token not found",
       };
     }
 
     cookie.delete("token");
   } catch (error) {
-    return {
-      error: error,
-    };
+    console.error("Unexpected error in logout:", error);
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return { error: error.message };
+    }
+
+    return { error: "An unexpected error occurred during logout" };
   }
 
   redirect("/");

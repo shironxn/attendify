@@ -6,7 +6,7 @@ import {
   ChartLineIcon,
   IdCardIcon,
   Settings2Icon,
-  SquareTerminal,
+  SquareTerminalIcon,
 } from "lucide-react"
 
 import { NavMain } from "@/components/dashboard/nav-main"
@@ -37,7 +37,7 @@ const data = {
     {
       title: "Monitor",
       url: "monitor",
-      icon: SquareTerminal,
+      icon: SquareTerminalIcon,
       isActive: true,
     },
     {

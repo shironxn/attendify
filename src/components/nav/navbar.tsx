@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   HomeIcon,
+  InfoIcon,
   MenuIcon,
 } from "lucide-react";
 import { DashboardIcon } from "@radix-ui/react-icons";
@@ -47,6 +48,13 @@ export function Navbar() {
                         Home
                       </DropdownMenuItem>
                     </Link>
+                    <Link href={"/about"}>
+                      <DropdownMenuItem>
+                        <InfoIcon />
+                        About
+                      </DropdownMenuItem>
+                    </Link>
+
                     <Link href={"/dashboard"}>
                       <DropdownMenuItem>
                         <DashboardIcon />
