@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/form"
 import { Input } from "../ui/input"
 import { useToast } from "@/hooks/use-toast"
+import { ReloadIcon } from "@radix-ui/react-icons"
+import { useTransition } from "react"
 
 const inputField = [
   {
@@ -38,6 +40,8 @@ const inputField = [
 ]
 
 export function RegisterForm() {
+  const [isLoading, startTransition] = useTransition()
+
   const { toast } = useToast()
   const form = useForm<Register>({
     resolver: zodResolver(RegisterSchema),
@@ -48,14 +52,16 @@ export function RegisterForm() {
     },
   })
 
-  const onSubmit = async (data: Register) => {
-    const res = await register(data)
-    if (res?.error) {
-      toast({
-        title: "Error",
-        description: res.error
-      })
-    }
+  function onSubmit(data: Register) {
+    startTransition(async () => {
+      const res = await register(data)
+      if (res?.error) {
+        toast({
+          title: "Error",
+          description: res.error
+        })
+      }
+    })
   }
 
   return (
@@ -77,8 +83,12 @@ export function RegisterForm() {
             )}
           />
         ))}
-        <Button type="submit" className="w-full">
-          Register
+        <Button type="submit" disabled={isLoading} className="w-full">
+          {isLoading ? (
+            <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            "Register"
+          )}
         </Button>
       </form>
     </Form>

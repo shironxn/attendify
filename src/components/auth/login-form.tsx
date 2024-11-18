@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/form"
 import { Input } from "../ui/input"
 import { useToast } from "@/hooks/use-toast"
+import { useTransition } from "react"
+import { ReloadIcon } from "@radix-ui/react-icons"
 
 const inputField = [
   {
@@ -32,6 +34,8 @@ const inputField = [
 ]
 
 export function LoginForm() {
+  const [isLoading, startTransition] = useTransition();
+
   const { toast } = useToast()
   const form = useForm<Login>({
     resolver: zodResolver(LoginSchema),
@@ -41,14 +45,16 @@ export function LoginForm() {
     },
   })
 
-  const onSubmit = async (data: Login) => {
-    const res = await login(data)
-    if (res?.error) {
-      toast({
-        title: "Error",
-        description: res.error
-      })
-    }
+  function onSubmit(data: Login) {
+    startTransition(async () => {
+      const res = await login(data)
+      if (res?.error) {
+        toast({
+          title: "Error",
+          description: res.error
+        })
+      }
+    })
   }
 
   return (
@@ -70,8 +76,12 @@ export function LoginForm() {
             )}
           />
         ))}
-        <Button type="submit" className="w-full">
-          Login
+        <Button type="submit" disabled={isLoading} className="w-full">
+          {isLoading ? (
+            <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            "Login"
+          )}
         </Button>
       </form>
     </Form>

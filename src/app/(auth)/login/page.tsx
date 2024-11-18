@@ -15,13 +15,13 @@ export default function Login() {
         <CardHeader>
           <CardTitle>Login</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Masukkan email dan kata sandi anda untuk mengakses akun anda.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <LoginForm />
           <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{" "}
+            Belum punya akun?{" "}
             <Link href="/register" className="underline">
               Register
             </Link>

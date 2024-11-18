@@ -15,13 +15,13 @@ export default function Register() {
         <CardHeader>
           <CardTitle>Register</CardTitle>
           <CardDescription>
-            Enter your email below to register to your account
+            Daftar sekarang untuk membuat akun baru dan menikmati semua fitur kami.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <RegisterForm />
           <div className="mt-4 text-center text-sm">
-            Already have an account?{" "}
+            Sudah punya akun?{" "}
             <Link href="/login" className="underline">
               Login
             </Link>
