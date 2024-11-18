@@ -22,8 +22,8 @@ model User {
 model Student {
   id           Int          @id @default(autoincrement())
   name         String
-  nis          Int          @unique
-  phone_number Int          @unique
+  nis          BigInt       @unique
+  phone_number BigInt       @unique
   class        Class
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")

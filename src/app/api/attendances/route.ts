@@ -40,49 +40,49 @@ export async function POST(request: Request) {
       (item) => item.status === "PULANG",
     );
 
-    //if (now.isSameOrAfter(exitTime)) {
-    //  status = "PULANG";
-    //  if (hasCheckedOut) {
-    //    return Response.json(
-    //      {
-    //        message: `Presensi pulang sudah tercatat untuk ${studentName}.`,
-    //        data: {
-    //          name: studentName,
-    //          status,
-    //        },
-    //      },
-    //      { status: 409 },
-    //    );
-    //  }
-    //  if (!hasCheckedIn) {
-    //    return Response.json(
-    //      {
-    //        message: `Presensi masuk belum tercatat untuk ${studentName}. Tidak dapat melakukan presensi pulang.`,
-    //        data: {
-    //          name: studentName,
-    //          status,
-    //        },
-    //      },
-    //      { status: 400 },
-    //    );
-    //  }
-    //} else {
-    //  status = now.isAfter(lateTime) ? "TELAT" : "HADIR";
-    //  if (hasCheckedIn) {
-    //    return Response.json(
-    //      {
-    //        message: `Presensi sudah tercatat untuk ${studentName}. Tidak dapat melakukan presensi lagi.`,
-    //        data: {
-    //          name: studentName,
-    //          status,
-    //        },
-    //      },
-    //      { status: 409 },
-    //    );
-    //  }
-    //}
+    if (now.isSameOrAfter(exitTime)) {
+      status = "PULANG";
+      if (hasCheckedOut) {
+        return Response.json(
+          {
+            message: `Presensi pulang sudah tercatat untuk ${card.student.name}.`,
+            data: {
+              name: card.student.name,
+              status,
+            },
+          },
+          { status: 409 },
+        );
+      }
+      if (!hasCheckedIn) {
+        return Response.json(
+          {
+            message: `Presensi masuk belum tercatat untuk ${card.student.name}. Tidak dapat melakukan presensi pulang.`,
+            data: {
+              name: card.student.name,
+              status,
+            },
+          },
+          { status: 400 },
+        );
+      }
+    } else {
+      status = now.isAfter(lateTime) ? "TELAT" : "HADIR";
+      if (hasCheckedIn) {
+        return Response.json(
+          {
+            message: `Presensi sudah tercatat untuk ${card.student.name}. Tidak dapat melakukan presensi lagi.`,
+            data: {
+              name: card.student.name,
+              status,
+            },
+          },
+          { status: 409 },
+        );
+      }
+    }
 
-    await prisma.attendance.create({
+    const attendance = await prisma.attendance.create({
       data: {
         student: {
           connect: { id: card.studentId },
@@ -97,23 +97,35 @@ export async function POST(request: Request) {
       },
     });
 
-    //const payload = {
-    //  chatId: `${card.student.phone_number}@c.us`,
-    //  message: `Anak anda ${card.student.name} sudah ${status.toLowerCase()} sekolah`,
-    //};
-    //await fetch(String(process.env.NEXT_PUBLIC_WHATSAPP_API_URL), {
-    //  method: "POST",
-    //  headers: {
-    //    "Content-Type": "application/json",
-    //  },
-    //  body: JSON.stringify(payload),
-    //});
+    let message;
+    switch (status) {
+      case "HADIR":
+        message = `Anak Anda, ${attendance.student.name}, telah sampai di SMAN 48 Jakarta dengan selamat pada pukul ${attendance.createdAt}. Terima kasih.`;
+        break;
+      case "TELAT":
+        message = `Anak Anda, ${attendance.student.name}, terlambat datang ke SMAN 48 Jakarta pada hari ini. Mohon konfirmasi alasan keterlambatan kepada wali kelas atau pihak sekolah. Terima kasih.`;
+      case "PULANG":
+        message = `Anak Anda, ${attendance.student.name}, telah meninggalkan SMAN 48 Jakarta dengan selamat pada pukul ${attendance.createdAt}. Terima kasih.`;
+        break;
+    }
+
+    const payload = {
+      chatId: `${attendance.student.phone_number}@c.us`,
+      message,
+    };
+    await fetch(String(process.env.NEXT_PUBLIC_WHATSAPP_API_URL), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
 
     return Response.json(
       {
-        message: `Presensi berhasil tercatat untuk ${card.student.name} dengan status ${status.toLowerCase()}.`,
+        message: `Presensi berhasil tercatat untuk ${attendance.student.name} dengan status ${status.toLowerCase()}.`,
         data: {
-          name: card.student.name,
+          name: attendance.student.name,
           status,
         },
       },

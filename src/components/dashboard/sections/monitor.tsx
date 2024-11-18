@@ -185,7 +185,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
             }
           });
       });
-    }, 5000);
+    }, 1000);
 
     if (attendance) {
       setData(attendance)
