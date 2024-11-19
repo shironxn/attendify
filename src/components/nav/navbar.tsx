@@ -10,9 +10,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import {
+  GithubIcon,
   HomeIcon,
   InfoIcon,
   MenuIcon,
+  UserSearchIcon,
 } from "lucide-react";
 import { DashboardIcon } from "@radix-ui/react-icons";
 import { usePathname } from "next/navigation";
@@ -48,17 +50,29 @@ export function Navbar() {
                         Home
                       </DropdownMenuItem>
                     </Link>
+                    <Link href={"/dashboard"}>
+                      <DropdownMenuItem>
+                        <DashboardIcon />
+                        Dashboard
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href={"/cari-siswa"}>
+                      <DropdownMenuItem>
+                        <UserSearchIcon />
+                        Cari Siswa
+                      </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuSeparator />
                     <Link href={"/about"}>
                       <DropdownMenuItem>
                         <InfoIcon />
                         About
                       </DropdownMenuItem>
                     </Link>
-
-                    <Link href={"/dashboard"}>
+                    <Link href={"https://github.com/shironxn/attendify"}>
                       <DropdownMenuItem>
-                        <DashboardIcon />
-                        Dashboard
+                        <GithubIcon />
+                        Github
                       </DropdownMenuItem>
                     </Link>
                     <DropdownMenuSeparator />

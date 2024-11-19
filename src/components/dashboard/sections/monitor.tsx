@@ -431,7 +431,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
                 <Label className="text-muted-foreground">NIS</Label>
                 <Input
                   id="nis"
-                  defaultValue={openView?.student.nis}
+                  defaultValue={String(openView?.student.nis)}
                   readOnly
                   className="col-span-3 bg-muted"
                 />
@@ -440,7 +440,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
                 <Label className="text-muted-foreground">Telepon</Label>
                 <Input
                   id="phone_number"
-                  defaultValue={openView?.student.phone_number}
+                  defaultValue={String(openView?.student.phone_number)}
                   readOnly
                   className="col-span-3 bg-muted"
                 />

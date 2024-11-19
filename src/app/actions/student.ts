@@ -55,6 +55,23 @@ export async function getStudentByID(id: number) {
   }
 }
 
+export async function getStudentByName(name: string) {
+  try {
+    const data = await prisma.student.findMany({ where: { name } });
+    return { data };
+  } catch (error) {
+    console.error("Failed to fetch student by name:", error);
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return { error: error.message };
+    }
+
+    return {
+      error: "An unexpected error occurred while fetching student data.",
+    };
+  }
+}
+
 export async function updateStudent(
   data: Prisma.StudentUpdateInput,
   id: number,

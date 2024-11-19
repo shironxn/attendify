@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/nav/navbar";
 import { ThemeProvider } from "@/hooks/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
+import AOSComponent from "@/hooks/aos";
 
 
 const geistSans = localFont({
@@ -37,11 +38,13 @@ export default function RootLayout({
           defaultTheme="system"
           enableSystem
         >
-          <Navbar />
-          <main>
-            {children}
-          </main>
-          <Toaster />
+          <AOSComponent>
+            <Navbar />
+            <main>
+              {children}
+            </main>
+            <Toaster />
+          </AOSComponent>
         </ThemeProvider>
       </body>
     </html>

@@ -3,9 +3,10 @@
 import Link from "next/link"
 import {
   ChevronsUpDown,
+  GithubIcon,
   HomeIcon,
+  InfoIcon,
   LogOut,
-  Sparkles,
 } from "lucide-react"
 
 import {
@@ -30,7 +31,6 @@ import {
 } from "@/components/ui/sidebar"
 import { logout } from "@/app/actions/auth"
 import { ToggleTheme } from "../nav/theme-toggle"
-import { DashboardIcon } from "@radix-ui/react-icons"
 
 export function NavUser({
   user,
@@ -87,6 +87,21 @@ export function NavUser({
                 <DropdownMenuItem>
                   <HomeIcon />
                   Home
+                </DropdownMenuItem>
+              </Link>
+              <Link href={"/about"}>
+                <DropdownMenuItem>
+                  <InfoIcon />
+                  About
+                </DropdownMenuItem>
+              </Link>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <Link href={"https://github.com/shironxn/attendify"}>
+                <DropdownMenuItem>
+                  <GithubIcon />
+                  Github
                 </DropdownMenuItem>
               </Link>
             </DropdownMenuGroup>

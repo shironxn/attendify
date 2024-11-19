@@ -100,12 +100,13 @@ export async function POST(request: Request) {
     let message;
     switch (status) {
       case "HADIR":
-        message = `Anak Anda, ${attendance.student.name}, telah sampai di SMAN 48 Jakarta dengan selamat pada pukul ${attendance.createdAt}. Terima kasih.`;
+        message = `Anak Anda, ${attendance.student.name}, telah sampai di SMAN 48 Jakarta dengan selamat pada pukul ${djs(attendance.createdAt).format("YYYY-MM-DD HH:mm:ss")}. Terima kasih.`;
         break;
       case "TELAT":
-        message = `Anak Anda, ${attendance.student.name}, terlambat datang ke SMAN 48 Jakarta pada hari ini. Mohon konfirmasi alasan keterlambatan kepada wali kelas atau pihak sekolah. Terima kasih.`;
+        message = `Anak Anda, ${attendance.student.name}, terlambat datang ke SMAN 48 Jakarta pada hari ini ${djs(attendance.createdAt).format("YYYY-MM-DD HH:mm:ss")}. Mohon konfirmasi alasan keterlambatan kepada wali kelas atau pihak sekolah. Terima kasih.`;
+        break;
       case "PULANG":
-        message = `Anak Anda, ${attendance.student.name}, telah meninggalkan SMAN 48 Jakarta dengan selamat pada pukul ${attendance.createdAt}. Terima kasih.`;
+        message = `Anak Anda, ${attendance.student.name}, telah meninggalkan SMAN 48 Jakarta dengan selamat pada pukul ${djs(attendance.createdAt).format("YYYY-MM-DD HH:mm:ss")}. Terima kasih.`;
         break;
     }
 
