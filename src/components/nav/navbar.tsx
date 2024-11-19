@@ -1,70 +1,88 @@
-"use client";
+"use client"
 
 import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import {
+  GithubIcon,
   HomeIcon,
+  InfoIcon,
   MenuIcon,
-  MoonIcon,
-  SunIcon,
+  UserSearchIcon,
 } from "lucide-react";
-import { useTheme } from "next-themes";
+import { DashboardIcon } from "@radix-ui/react-icons";
+import { usePathname } from "next/navigation";
+import { ToggleTheme } from "./theme-toggle";
 
 export function Navbar() {
-  const { theme, setTheme } = useTheme()
+  const pathname = usePathname()
   return (
     <>
-      <header className="w-full fixed">
-        <nav className="flex justify-between p-5 items-center">
-          <Link href={"/"} className="text-lg font-extrabold md:text-base">
-            A.
-          </Link>
+      {pathname !== "/dashboard" &&
+        <header className="w-full fixed">
+          <nav className="flex justify-between p-5 items-center">
+            <Link href={"/"} className="text-lg font-extrabold md:text-base">
+              A.
+            </Link>
 
-          <div className="flex items-center gap-2">
-            <div>
-              <DropdownMenu >
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="overflow-hidden"
-                  >
-                    <MenuIcon className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuLabel>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <Link href={"/"}>
-                    <DropdownMenuItem>
-                      Home
-                      <DropdownMenuShortcut>
-                        <HomeIcon className="w-4 h-4" />
-                      </DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                  </Link>
-                  <DropdownMenuItem onClick={() => theme === "light" ? setTheme("dark") : setTheme("light")}>
-                    Theme
-                    <DropdownMenuShortcut>
-                      {theme === "light" ? <SunIcon className="w-4 h-4" /> : <MoonIcon className="w-4 h-4" />}
-                    </DropdownMenuShortcut>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <div className="flex items-center gap-2">
+              <div>
+                <DropdownMenu >
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="overflow-hidden"
+                    >
+                      <MenuIcon />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <Link href={"/"}>
+                      <DropdownMenuItem>
+                        <HomeIcon />
+                        Home
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href={"/dashboard"}>
+                      <DropdownMenuItem>
+                        <DashboardIcon />
+                        Dashboard
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href={"/cari-siswa"}>
+                      <DropdownMenuItem>
+                        <UserSearchIcon />
+                        Cari Siswa
+                      </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuSeparator />
+                    <Link href={"/about"}>
+                      <DropdownMenuItem>
+                        <InfoIcon />
+                        About
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href={"https://github.com/shironxn/attendify"}>
+                      <DropdownMenuItem>
+                        <GithubIcon />
+                        Github
+                      </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuSeparator />
+                    <ToggleTheme />
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
-          </div>
-        </nav>
-      </header>
-    </>
+          </nav>
+        </header>
+      }</>
   );
 }
