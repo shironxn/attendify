@@ -5,8 +5,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,17 +13,48 @@ import { useTransition, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { getStudentByName } from "@/app/actions/student";
-import { Student } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { EyeIcon, SearchIcon } from "lucide-react";
+import djs from "@/lib/dayjs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
+
+type StudentWithAttendance = Prisma.StudentGetPayload<{
+  include: { attendances: true };
+}>;
 
 export function CariSiswaForm() {
   const [isLoading, startTransition] = useTransition();
-  const [students, setStudents] = useState<Student[] | null>(null);
   const { toast } = useToast();
+
+  const [students, setStudents] = useState<StudentWithAttendance[] | null>(null);
+  const [openView, setOpenView] = useState<StudentWithAttendance | null>(null);
+
 
   const form = useForm<{ search: string }>({
     defaultValues: {
       search: "",
-    },
+    }
   });
 
   async function onSubmit(data: { search: string }) {
@@ -39,6 +68,7 @@ export function CariSiswaForm() {
         });
         return;
       }
+
       if (res?.data) {
         setStudents(res.data);
       }
@@ -46,44 +76,113 @@ export function CariSiswaForm() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-8">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-center gap-2">
           <FormField
             control={form.control}
             name="search"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Cari Siswa</FormLabel>
                 <FormControl>
-                  <Input placeholder="Masukkan nama siswa" {...field} />
+                  <Input placeholder="Masukkan nama siswa" {...field} required />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit" disabled={isLoading} className="w-full">
+          <Button type="submit" disabled={isLoading} size="icon">
             {isLoading ? (
-              <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+              <ReloadIcon className="animate-spin" />
             ) : (
-              "Cari"
+              <SearchIcon />
+
             )}
           </Button>
         </form>
       </Form>
 
-      <div className="border rounded-lg p-4">
-        <h2 className="text-lg font-bold">Hasil Pencarian:</h2>
-        {students === null && <p>Belum ada pencarian.</p>}
-        {students?.length === 0 && <p>Data siswa tidak ditemukan.</p>}
-        {students?.map((student) => (
-          <div key={student.id} className="p-2 border-b">
-            <p><strong>ID:</strong> {student.id}</p>
-            <p><strong>Nama:</strong> {student.name}</p>
-            <p><strong>Kelas:</strong> {student.class}</p>
-          </div>
-        ))}
-      </div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[100px]">ID</TableHead>
+            <TableHead>Nama</TableHead>
+            <TableHead>Kelas</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {students?.map((item, index) => (
+            <TableRow key={index}>
+              <TableCell className="font-medium">{item.id}</TableCell>
+              <TableCell>{item.name}</TableCell>
+              <TableCell>{item.class}</TableCell>
+              <TableCell className="flex justify-end">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button size="icon" variant="outline" onClick={() => item.attendances.length !== 0 ? setOpenView(item) : toast({ title: "Error", description: "Belum ada data kehadiran", variant: "destructive" })}>
+                        <EyeIcon />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Lihat</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      <Dialog open={openView !== null} onOpenChange={() => setOpenView(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Informasi Kehadiran</DialogTitle>
+          </DialogHeader>
+
+          <section className="space-y-4">
+            <div className="grid grid-cols-4 gap-4 items-center">
+              <Label className="text-muted-foreground">Nama</Label>
+              <Input
+                id="nama"
+                defaultValue={openView?.name}
+                readOnly
+                className="col-span-3 bg-muted"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 gap-4 items-center">
+              <Label className="text-muted-foreground">Status</Label>
+              <Input
+                id="status"
+                defaultValue={openView?.attendances[0].status}
+                readOnly
+                className="col-span-3 bg-muted"
+              />
+            </div>
+            <div className="grid grid-cols-4 gap-4 items-center">
+              <Label className="text-muted-foreground">Keterangan</Label>
+              <Input
+                id="description"
+                defaultValue={openView?.attendances[0].description || "-"}
+                readOnly
+                className="col-span-3 bg-muted focus:ring-0"
+              />
+            </div>
+            <div className="grid grid-cols-4 gap-4 items-center">
+              <Label className="text-muted-foreground">Waktu</Label>
+              <Input
+                id="created_at"
+                defaultValue={djs(openView?.createdAt).format(
+                  "LLL"
+                )}
+                readOnly
+                className="col-span-3 bg-muted"
+              />
+            </div>
+          </section>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

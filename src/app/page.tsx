@@ -29,7 +29,7 @@ const faqs = [
 
 export default function Home() {
   return (
-    <>
+    <div className="overflow-x-hidden">
       <div className="grid grid-cols-1 md:grid-cols-2 md:gap-8 items-center min-h-screen justify-center container" data-aos="zoom-out">
         <div className="hidden md:block">
           <Image
@@ -180,7 +180,7 @@ export default function Home() {
         </div>
       </section>
 
-    </>
+    </div>
   );
 }
 

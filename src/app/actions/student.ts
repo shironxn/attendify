@@ -1,5 +1,6 @@
 "use server";
 
+import djs from "@/lib/dayjs";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
@@ -57,7 +58,29 @@ export async function getStudentByID(id: number) {
 
 export async function getStudentByName(name: string) {
   try {
-    const data = await prisma.student.findMany({ where: { name } });
+    const data = await prisma.student.findMany({
+      where: {
+        name: {
+          contains: name,
+          mode: "insensitive",
+        },
+      },
+      include: {
+        attendances: {
+          where: {
+            createdAt: {
+              gte: djs().startOf("day").toDate(),
+              lte: djs().endOf("day").toDate(),
+            },
+          },
+        },
+      },
+    });
+
+    if (data.length === 0) {
+      return { error: "Nama siswa tidak ditemukan" };
+    }
+
     return { data };
   } catch (error) {
     console.error("Failed to fetch student by name:", error);

@@ -20,7 +20,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Attendify",
-  description: "Easily track attendance with just one tap using our RFID technology.",
+  description: "Lacak kehadiran dengan mudah hanya dengan satu ketukan menggunakan teknologi RFID kami.",
 };
 
 export default function RootLayout({
@@ -30,6 +30,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/cards.svg" sizes="any" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
