@@ -481,7 +481,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
                 <Input
                   id="created_at"
                   defaultValue={djs(openView?.createdAt).format(
-                    "YYYY-MM-DD HH:mm:ss"
+                    "LLL"
                   )}
                   readOnly
                   className="col-span-3 bg-muted"
