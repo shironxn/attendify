@@ -44,7 +44,7 @@ export default function Home() {
           <h1 >Welcome To Attendify</h1>
           <p>Lacak kehadiran menjadi lebih mudah! Cukup satu ketukan dengan teknologi RFID, kehadiran langsung tercatat dengan cepat dan akurat.</p>
           <div className="flex justify-center md:justify-start gap-4 mt-4">
-            <Link href={"/demo"}>
+            <Link href={"https://www.instagram.com/reel/DCqc0W6y-hv/?utm_source=ig_web_copy_link"} target="_blank">
               <Button size={"lg"}>Demo</Button>
             </Link>
             <Link href={"/about"}>
