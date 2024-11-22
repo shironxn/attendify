@@ -26,9 +26,9 @@ import {
   LogOutIcon,
   SquarePenIcon,
   Trash2Icon,
-  UserCheckIcon,
-  UserMinusIcon,
-  UserXIcon,
+  UserRoundCheckIcon,
+  UserRoundMinusIcon,
+  UserRoundXIcon,
 } from "lucide-react";
 import {
   Select,
@@ -91,17 +91,17 @@ type AttendanceWithStudent = Prisma.AttendanceGetPayload<{
 const cards = [
   {
     title: "Hadir",
-    icon: UserCheckIcon,
+    icon: UserRoundCheckIcon,
     content: 0,
   },
   {
     title: "Telat",
-    icon: UserMinusIcon,
+    icon: UserRoundMinusIcon,
     content: 0,
   },
   {
     title: "Tidak Hadir",
-    icon: UserXIcon,
+    icon: UserRoundXIcon,
     content: 0,
   },
   {
