@@ -3,7 +3,7 @@ import { IdCardIcon } from "lucide-react";
 export default function About() {
   return (
     <div className="container mx-auto py-32">
-      <div className="grid grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-2 gap-8">
         <div>
           <h1>About</h1>
           <p>
