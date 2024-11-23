@@ -83,7 +83,14 @@ enum Status {
 }
 
 enum Class {
+  XI1
+  XI2
+  XI3
+  XI4
   XI5
+  XI6
+  XI7
+  XI8
 }
 
 enum Mode {

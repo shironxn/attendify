@@ -227,7 +227,6 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
 
 
   async function onSubmit(data: Attendance) {
-    console.log(data)
     const res = await updateAttendance(data)
 
     if (res?.error) {

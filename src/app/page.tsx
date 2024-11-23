@@ -42,7 +42,7 @@ export default function Home() {
 
         <div className="text-center md:text-left">
           <h1 >Welcome To Attendify</h1>
-          <p>Lacak kehadiran menjadi lebih mudah! Cukup satu ketukan dengan teknologi RFID, kehadiran langsung tercatat dengan cepat dan akurat.</p>
+          <p>Lacak kehadiran menjadi lebih mudah! Cukup dengan sekali tap kehadiran langsung tercatat dengan cepat dan akurat.</p>
           <div className="flex justify-center md:justify-start gap-4 mt-4">
             <Link href={"https://www.instagram.com/reel/DCqc0W6y-hv/?utm_source=ig_web_copy_link"} target="_blank">
               <Button size={"lg"}>Demo</Button>
@@ -61,7 +61,7 @@ export default function Home() {
               Mencatat Kehadiran Menjadi Lebih Mudah
             </h1>
             <p className="max-w-xl text-lg" data-aos="fade-up">
-              Attendify mempermudah pengelolaan presensi secara cepat dan otomatis. Dengan teknologi berbasis RFID, Anda dapat melacak kehadiran secara cepat, aman, dan efisien hanya dalam hitungan detik, menghemat waktu sekaligus mengurangi kesalahan manual.
+              Attendify mempermudah pengelolaan presensi secara cepat dan otomatis. Dengan teknologi berbasis RFID, anda dapat melacak kehadiran secara cepat, aman, dan efisien hanya dalam hitungan detik, menghemat waktu sekaligus mengurangi kesalahan manual.
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-2">

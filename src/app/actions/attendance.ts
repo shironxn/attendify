@@ -43,7 +43,6 @@ export async function createAttendance(data: Prisma.AttendanceCreateInput) {
 }
 
 export async function updateAttendance(data: Attendance) {
-  console.log(data);
   try {
     await prisma.attendance.update({
       data: {
@@ -81,4 +80,70 @@ export async function deleteAttendance(id: number) {
   }
 
   revalidatePath("/dashboard");
+}
+
+export async function getAttendanceCount() {
+  try {
+    const now = djs();
+
+    const data = await prisma.attendance.groupBy({
+      by: ["status", "createdAt"],
+      where: {
+        createdAt: {
+          gte: now.startOf("month").toDate(),
+          lt: now.endOf("month").toDate(),
+        },
+        status: {
+          not: "PULANG",
+        },
+      },
+      _count: {
+        id: true,
+      },
+    });
+
+    const groupedData = new Map<string, { status: string; count: number }[]>();
+
+    data.forEach((item) => {
+      const date = djs(item.createdAt).format("YYYY-MM-DD");
+
+      if (!groupedData.has(date)) {
+        groupedData.set(date, []);
+      }
+
+      groupedData.get(date)?.push({
+        status: item.status.toLowerCase(),
+        count: item._count.id,
+      });
+    });
+
+    const result = Array.from(groupedData.entries()).map(([date, data]) => {
+      const statusCounts = data.reduce(
+        (acc: { status: string; count: number }[], curr) => {
+          const existing = acc.find((item) => item.status === curr.status);
+          if (existing) {
+            existing.count += curr.count;
+          } else {
+            acc.push({ status: curr.status, count: curr.count });
+          }
+          return acc;
+        },
+        [],
+      );
+
+      return { date, data: statusCounts };
+    });
+
+    return { data: result, total: data.length };
+  } catch (error) {
+    console.error("Unexpected error in getAttendance:", error);
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new Error(error.message);
+    }
+
+    throw new Error(
+      "An unexpected error occurred while fetching attendance data.",
+    );
+  }
 }

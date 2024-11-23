@@ -24,7 +24,8 @@ import {
 } from "@/components/ui/card"
 import { BotIcon, ChartLineIcon, Settings2Icon, SquareTerminalIcon } from "lucide-react"
 import Link from "next/link"
-import { getAttendance } from "../actions/attendance"
+import { getAttendance, getAttendanceCount } from "../actions/attendance"
+import { StatsSection } from "@/components/dashboard/sections/stats"
 
 const navList = [
   {
@@ -60,6 +61,7 @@ export default async function Dashboard(props: { searchParams?: Promise<{ sectio
 
   const user = await getAuth()
   const attendance = await getAttendance()
+  const chart = await getAttendanceCount()
 
   return (
     <SidebarProvider>
@@ -112,6 +114,7 @@ export default async function Dashboard(props: { searchParams?: Promise<{ sectio
               </div>
             </div>}
           {section === "monitor" && <MonitorSection attendance={attendance} />}
+          {section === "stats" && <StatsSection data={chart} />}
         </div>
       </SidebarInset>
     </SidebarProvider>
