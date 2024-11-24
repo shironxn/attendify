@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  createAttendance,
   deleteAttendance,
   getAttendance,
   updateAttendance,
@@ -14,7 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import djs from "@/lib/dayjs";
-import { Attendance, Prisma, Status } from "@prisma/client";
+import { Class, Prisma, Status } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -24,11 +25,12 @@ import {
   ChevronsRightIcon,
   EyeIcon,
   LogOutIcon,
+  PlusCircleIcon,
   SquarePenIcon,
   Trash2Icon,
-  UserCheckIcon,
-  UserMinusIcon,
-  UserXIcon,
+  UserRoundCheckIcon,
+  UserRoundMinusIcon,
+  UserRoundXIcon,
 } from "lucide-react";
 import {
   Select,
@@ -81,8 +83,22 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { CaretSortIcon } from "@radix-ui/react-icons";
+import { AttendanceCraeteForm, AttendanceCreateSchema, AttendanceUpdateForm, AttendanceUpdateSchema } from "@/lib/types";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type AttendanceWithStudent = Prisma.AttendanceGetPayload<{
   include: { student: true };
@@ -91,17 +107,17 @@ type AttendanceWithStudent = Prisma.AttendanceGetPayload<{
 const cards = [
   {
     title: "Hadir",
-    icon: UserCheckIcon,
+    icon: UserRoundCheckIcon,
     content: 0,
   },
   {
     title: "Telat",
-    icon: UserMinusIcon,
+    icon: UserRoundMinusIcon,
     content: 0,
   },
   {
     title: "Tidak Hadir",
-    icon: UserXIcon,
+    icon: UserRoundXIcon,
     content: 0,
   },
   {
@@ -128,6 +144,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
   >([]);
 
   const [search, setSearch] = useState("");
+  const [kelas, setKelas] = useState<Class | null>(null);
   const [time, setTime] = useState("TODAY");
   const [status, setStatus] = useState("SEMUA");
 
@@ -135,18 +152,29 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
   const [sizePage, setSizePage] = useState(10);
   const [totalPage, setTotalPage] = useState(10);
 
+  const [openAdd, setOpenAdd] = useState(false);
   const [openView, setOpenView] = useState<AttendanceWithStudent | null>(null);
   const [openEdit, setOpenEdit] = useState<AttendanceWithStudent | null>(null);
   const [openDelete, setOpenDelete] = useState<number | null>(null);
 
-  const form = useForm<Attendance>({
+
+  const formAdd = useForm<AttendanceCraeteForm>({
+    resolver: zodResolver(AttendanceCreateSchema),
     defaultValues: {
-      id: Number(openEdit?.id),
-      status: openEdit?.status,
-      description: openEdit?.description,
+      nisn: "",
+      status: "",
+      description: "",
     },
   });
 
+  const formEdit = useForm<AttendanceUpdateForm>({
+    resolver: zodResolver(AttendanceUpdateSchema),
+    defaultValues: {
+      id: "",
+      status: "",
+      description: "",
+    },
+  })
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -208,40 +236,48 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
         .filter((item) =>
           time === "TODAY" ? djs().isSame(item.createdAt, "day") : true
         )
-        .filter((item) => (status !== "SEMUA" ? item.status === status : true));
+        .filter((item) => (status !== "SEMUA" ? item.status === status : true))
+        .filter((item => kelas ? item.student.class === kelas : true));
 
       setFilteredData(filteredData.slice(start, end));
       setTotalPage(Math.ceil(filteredData.length / sizePage));
     }
-  }, [data, search, time, status, page, sizePage, totalPage]);
+  }, [data, search, kelas, time, status, page, sizePage, totalPage]);
 
   useEffect(() => {
     if (openEdit) {
-      form.reset({
-        id: openEdit.id,
+      formEdit.reset({
+        id: String(openEdit.id),
         status: openEdit.status,
-        description: openEdit.description
+        description: String(openEdit.description) ?? ""
       })
     }
-  }, [openEdit, form])
+  }, [openEdit, formEdit])
 
 
-  async function onSubmit(data: Attendance) {
-    console.log(data)
-    const res = await updateAttendance(data)
+  async function onSubmit(data: AttendanceCraeteForm | AttendanceUpdateForm, type: "tambah" | "update") {
+    const res = type === "tambah" ? await createAttendance(data as AttendanceCraeteForm) : await updateAttendance(data as AttendanceUpdateForm)
 
-    if (res?.error) {
+    if (typeof res === "object" && "error" in res && res.error) {
       toast({
         title: "Error",
-        description: res.error
-      })
-      return
+        description: res.error,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (type === "tambah") {
+      setOpenAdd(false);
+    } else {
+      setOpenEdit(null);
     }
 
     toast({
       title: "Sukses",
-      description: "Berhasil update presensi"
+      description: `Berhasil ${type} presensi`
     })
+
   }
 
   async function onDelete(id: number) {
@@ -263,7 +299,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
 
   return (
     <div className="space-y-8">
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
         {cards.map((item, index) => (
           <Card key={index}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -278,35 +314,82 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
           </Card>
         ))}
       </div>
-      <div className="grid gap-4 grid-cols-6">
-        <Input
-          placeholder="Cari"
-          className="col-span-4"
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <Select onValueChange={setTime}>
-          <SelectTrigger>
-            <SelectValue placeholder="Hari ini" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="TODAY">Hari ini</SelectItem>
-            <SelectItem value="ALL">Semua</SelectItem>{" "}
-          </SelectContent>
-        </Select>
-        <Select onValueChange={setStatus}>
-          <SelectTrigger>
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="SEMUA">Semua</SelectItem>
-            {statusList.map((item, index) => (
-              <SelectItem value={item} key={index}>
-                {item.slice(0, 1) + item.slice(1).toLowerCase()}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+
+      <div className="grid grid-cols-6 gap-4">
+        <div className="col-span-6 md:col-span-2 flex gap-4">
+          <Input
+            placeholder="Cari Siswa"
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <div>
+            <Button size={"icon"} onClick={() => setOpenAdd(true)}><PlusCircleIcon /></Button>
+          </div>
+        </div>
+
+        <div className="col-span-2 md:col-span-1 md:col-start-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1">
+              {kelas ? kelas : "Kelas"}<CaretSortIcon className="h-4 w-4 opacity-50" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {[...Array(3)].map((_, indexClass) => {
+                const className = indexClass === 0 ? "X" : indexClass === 1 ? "XI" : "XII";
+                return (
+                  <DropdownMenuSub key={indexClass}>
+                    <DropdownMenuSubTrigger>
+                      <span>{className}</span>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent>
+                        {[...Array(8)].map((_, index) => (
+                          <DropdownMenuItem
+                            key={index}
+                            onClick={() => setKelas(`${className}${index + 1}` as Class)}
+                          >
+                            <span>{index + 1}</span>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+                );
+              })}
+              <DropdownMenuItem onClick={() => setKelas(null)}>
+                Semua
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        <div className="col-span-2 md:col-span-1 md:col-start-5">
+          <Select onValueChange={setTime}>
+            <SelectTrigger>
+              <SelectValue placeholder="Hari ini" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="TODAY">Hari ini</SelectItem>
+              <SelectItem value="ALL">Semua</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="col-span-2 md:col-span-1 md:col-start-6">
+          <Select onValueChange={setStatus}>
+            <SelectTrigger>
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="SEMUA">Semua</SelectItem>
+              {statusList.map((item, index) => (
+                <SelectItem value={item} key={index}>
+                  {item.slice(0, 1) + item.slice(1).toLowerCase()}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
+
       <Table>
         <TableHeader>
           <TableRow>
@@ -410,6 +493,84 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
         </div>
       </div>
 
+      <Dialog open={openAdd} onOpenChange={setOpenAdd}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Menambahkan Kehadiran</DialogTitle>
+          </DialogHeader>
+          <Form {...formAdd}>
+            <form onSubmit={formAdd.handleSubmit(data => onSubmit(data, "tambah"))} className="space-y-4">
+              <FormField
+                control={formAdd.control}
+                name="nisn"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>NISN</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Masukkan NISN siswa (10 digit)"
+                        value={field.value || ""}
+                        onChange={e => formAdd.setValue("nisn", e.target.value)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={formAdd.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih status siswa" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent defaultValue={openEdit?.status}>
+                        {Object.values(Status).map((item, index) => (
+                          <SelectItem
+                            className="col-span-3"
+                            defaultValue={openEdit?.status}
+                            value={item.valueOf()}
+                            key={index}
+                          >
+                            {item.valueOf()}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={formAdd.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Keterangan</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Contoh: Siswa hadir, sakit, atau izin"
+                        value={field.value || ""}
+                        onChange={e => formAdd.setValue("description", e.target.value)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <SheetFooter>
+                <Button type="submit">Tambah</Button>
+              </SheetFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={openView !== null} onOpenChange={() => setOpenView(null)}>
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -431,7 +592,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
                 <Label className="text-muted-foreground">NIS</Label>
                 <Input
                   id="nis"
-                  defaultValue={String(openView?.student.nis)}
+                  defaultValue={String(openView?.student.nisn)}
                   readOnly
                   className="col-span-3 bg-muted"
                 />
@@ -490,7 +651,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
             </section>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="gap-4">
             <DialogClose asChild>
               <Button type="button" variant="secondary">
                 Tutup
@@ -504,7 +665,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
 === Informasi Siswa ===
 - ID: ${openView.student.id}
 - Nama: ${openView.student.name}
-- NIS: ${openView.student.nis}
+- NIS: ${openView.student.nisn}
 - Telepon: ${openView.student.phone_number}
 - Kelas: ${openView.student.class}
 
@@ -533,10 +694,10 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
               Cek lagi datanya sebelum disimpan, pastikan semuanya sudah sesuai karena perubahan ini bersifat permanen.
             </SheetDescription>
           </SheetHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-8">
+          <Form {...formEdit}>
+            <form onSubmit={formEdit.handleSubmit(data => onSubmit(data, "update"))} className="space-y-4 mt-8">
               <FormField
-                control={form.control}
+                control={formEdit.control}
                 name="status"
                 render={({ field }) => (
                   <FormItem>
@@ -570,7 +731,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
                 )}
               />
               <FormField
-                control={form.control}
+                control={formEdit.control}
                 name="description"
                 render={({ field }) => (
                   <FormItem>
@@ -578,7 +739,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
                     <FormControl>
                       <Input
                         value={field.value || ""}
-                        onChange={e => form.setValue("description", e.target.value)}
+                        onChange={e => formEdit.setValue("description", e.target.value)}
                       />
                     </FormControl>
                   </FormItem>

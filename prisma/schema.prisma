@@ -22,7 +22,7 @@ model User {
 model Student {
   id           Int          @id @default(autoincrement())
   name         String
-  nis          BigInt       @unique
+  nisn         BigInt       @unique
   phone_number BigInt       @unique
   class        Class
   createdAt    DateTime     @default(now()) @map("created_at")
@@ -36,12 +36,12 @@ model Student {
 model Attendance {
   id          Int      @id @default(autoincrement())
   studentId   Int      @map("student_id")
-  readerId    Int      @map("reader_id")
+  readerId    Int?     @map("reader_id")
   status      Status   @default(HADIR)
   description String?
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
-  reader      Reader   @relation(fields: [readerId], references: [id])
+  reader      Reader?  @relation(fields: [readerId], references: [id])
   student     Student  @relation(fields: [studentId], references: [id])
 
   @@map("attendances")
@@ -83,11 +83,33 @@ enum Status {
 }
 
 enum Class {
+  X1
+  X2
+  X3
+  X4
+  X5
+  X6
+  X7
+  X8
+  XI1
+  XI2
+  XI3
+  XI4
   XI5
+  XI6
+  XI7
+  XI8
+  XII1
+  XII2
+  XII3
+  XII4
+  XII5
+  XII6
+  XII7
+  XII8
 }
 
 enum Mode {
   ACTIVE
   INACTIVE
-  ADD
 }

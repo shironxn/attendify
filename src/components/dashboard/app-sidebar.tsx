@@ -25,7 +25,6 @@ const data = {
   user: {
     name: "",
     email: "",
-    avatar: "",
   },
   header:
   {
@@ -62,8 +61,8 @@ export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sideb
   data.user = {
     name: user.name,
     email: user.email,
-    avatar: "/avatars/shadcn.jpg"
   }
+
 
   return (
     <Sidebar collapsible="icon" {...props}>

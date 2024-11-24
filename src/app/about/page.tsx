@@ -1,17 +1,22 @@
+import { IdCardIcon } from "lucide-react";
+
 export default function About() {
   return (
-    <section className="py-32">
-      <div className="container max-w-lg">
-        <div className="text-center">
-          <h1 className="mt-4 text-4xl font-semibold">
-            Informasi
-          </h1>
-          <p className="mt-6 font-medium text-muted-foreground">
-            Attendify adalah solusi modern untuk pelacakan kehadiran berbasis teknologi. Dengan fitur yang mudah digunakan, kami membantu mempermudah manajemen kehadiran secara akurat dan efisien.
+    <div className="container mx-auto py-32">
+      <div className="grid md:grid-cols-2 gap-8">
+        <div>
+          <h1>About</h1>
+          <p>
+            Attendify adalah solusi modern untuk pelacakan kehadiran berbasis teknologi yang dirancang untuk memenuhi kebutuhan institusi pendidikan dan perusahaan.
+            Dengan fitur yang mudah digunakan, platform ini memungkinkan manajemen kehadiran secara real-time, meminimalkan kesalahan manual, dan meningkatkan efisiensi operasional.
+            Selain itu, Attendify juga mendukung integrasi dengan berbagai perangkat IoT untuk memberikan pengalaman yang lebih canggih dan fleksibel.
           </p>
         </div>
+        <div className="flex justify-center items-center bg-muted rounded-2xl p-8">
+          <IdCardIcon className="w-16 h-16" />
+        </div>
       </div>
-    </section>
+    </div>
   );
 };
 

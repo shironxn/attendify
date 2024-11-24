@@ -23,19 +23,19 @@ const inputField = [
     name: "name",
     type: "text",
     label: "Name",
-    placeholder: ""
+    placeholder: "Masukkan nama anda"
   },
   {
     name: "email",
     type: "email",
     label: "Email",
-    placeholder: ""
+    placeholder: "Masukkan email anda"
   },
   {
     name: "password",
     type: "password",
     label: "Password",
-    placeholder: ""
+    placeholder: "Masukkan password anda"
   }
 ]
 

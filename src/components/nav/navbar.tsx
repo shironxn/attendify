@@ -14,7 +14,7 @@ import {
   HomeIcon,
   InfoIcon,
   MenuIcon,
-  UserSearchIcon,
+  UserRoundSearchIcon,
 } from "lucide-react";
 import { DashboardIcon } from "@radix-ui/react-icons";
 import { usePathname } from "next/navigation";
@@ -25,7 +25,7 @@ export function Navbar() {
   return (
     <>
       {pathname !== "/dashboard" &&
-        <header className="w-full fixed">
+        <header>
           <nav className="flex justify-between p-5 items-center">
             <Link href={"/"} className="text-lg font-extrabold md:text-base">
               A.
@@ -58,7 +58,7 @@ export function Navbar() {
                     </Link>
                     <Link href={"/cari-siswa"}>
                       <DropdownMenuItem>
-                        <UserSearchIcon />
+                        <UserRoundSearchIcon />
                         Cari Siswa
                       </DropdownMenuItem>
                     </Link>

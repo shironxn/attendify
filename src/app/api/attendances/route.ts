@@ -100,26 +100,25 @@ export async function POST(request: Request) {
     let message;
     switch (status) {
       case "HADIR":
-        message = `Anak Anda, ${attendance.student.name}, telah sampai di SMAN 48 Jakarta dengan selamat pada pukul ${djs(attendance.createdAt).format("YYYY-MM-DD HH:mm:ss")}. Terima kasih.`;
+        message = `Anak Anda, ${attendance.student.name}, telah sampai di SMAN 48 Jakarta dengan selamat pada ${djs(attendance.createdAt).format("LLL")}. Terima kasih.`;
         break;
       case "TELAT":
-        message = `Anak Anda, ${attendance.student.name}, terlambat datang ke SMAN 48 Jakarta pada hari ini ${djs(attendance.createdAt).format("YYYY-MM-DD HH:mm:ss")}. Mohon konfirmasi alasan keterlambatan kepada wali kelas atau pihak sekolah. Terima kasih.`;
+        message = `Anak Anda, ${attendance.student.name}, terlambat datang ke SMAN 48 Jakarta pada ${djs(attendance.createdAt).format("LLL")}. Mohon konfirmasi alasan keterlambatan kepada wali kelas atau pihak sekolah. Terima kasih.`;
         break;
       case "PULANG":
-        message = `Anak Anda, ${attendance.student.name}, telah meninggalkan SMAN 48 Jakarta dengan selamat pada pukul ${djs(attendance.createdAt).format("YYYY-MM-DD HH:mm:ss")}. Terima kasih.`;
+        message = `Anak Anda, ${attendance.student.name}, telah meninggalkan SMAN 48 Jakarta dengan selamat pada ${djs(attendance.createdAt).format("LLL")}. Terima kasih.`;
         break;
     }
 
-    const payload = {
-      chatId: `${attendance.student.phone_number}@c.us`,
-      message,
-    };
     await fetch(String(process.env.NEXT_PUBLIC_WHATSAPP_API_URL), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        chatId: `${attendance.student.phone_number}@c.us`,
+        message,
+      }),
     });
 
     return Response.json(

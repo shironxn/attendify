@@ -24,7 +24,13 @@ import {
 } from "@/components/ui/card"
 import { BotIcon, ChartLineIcon, Settings2Icon, SquareTerminalIcon } from "lucide-react"
 import Link from "next/link"
-import { getAttendance } from "../actions/attendance"
+import { getAttendance, getAttendanceCount } from "../actions/attendance"
+import { StatsSection } from "@/components/dashboard/sections/stats"
+import { getStudent } from "../actions/student"
+import { ControlSection } from "@/components/dashboard/sections/control"
+import { getReader } from "../actions/reader"
+import { redirect } from "next/navigation"
+import SettingSection from "@/components/dashboard/sections/setting"
 
 const navList = [
   {
@@ -60,6 +66,13 @@ export default async function Dashboard(props: { searchParams?: Promise<{ sectio
 
   const user = await getAuth()
   const attendance = await getAttendance()
+  const chart = await getAttendanceCount()
+  const student = await getStudent()
+  const reader = await getReader()
+
+  if (!user.data) {
+    redirect("/")
+  }
 
   return (
     <SidebarProvider>
@@ -112,6 +125,9 @@ export default async function Dashboard(props: { searchParams?: Promise<{ sectio
               </div>
             </div>}
           {section === "monitor" && <MonitorSection attendance={attendance} />}
+          {section === "stats" && <StatsSection data={chart} />}
+          {section === "control" && <ControlSection student={student} reader={reader} user={user.data} />}
+          {section === "setting" && <SettingSection user={user.data} />}
         </div>
       </SidebarInset>
     </SidebarProvider>
