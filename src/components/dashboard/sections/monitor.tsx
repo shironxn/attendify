@@ -259,13 +259,13 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
   async function onSubmit(data: AttendanceCraeteForm | AttendanceUpdateForm, type: "tambah" | "update") {
     const res = type === "tambah" ? await createAttendance(data as AttendanceCraeteForm) : await updateAttendance(data as AttendanceUpdateForm)
 
-    if (res?.error) {
+    if (typeof res === "object" && "error" in res && res.error) {
       toast({
         title: "Error",
         description: res.error,
-        variant: "destructive"
-      })
-      return
+        variant: "destructive",
+      });
+      return;
     }
 
     if (type === "tambah") {
