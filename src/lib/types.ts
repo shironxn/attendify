@@ -157,6 +157,16 @@ export const AttendanceUpdateSchema = z.object({
     .optional(),
 });
 
+export const UserUpdateSchema = z.object({
+  id: z.string().optional(),
+  name: z
+    .string()
+    .max(32, "Nama maksimal 32 karakter")
+    .regex(/^[a-zA-Z\s]*$/, "Nama hanya boleh mengandung huruf dan spasi")
+    .optional(),
+  email: z.string().email("Email harus memiliki format yang valid").optional(),
+});
+
 export type Login = z.infer<typeof LoginSchema>;
 export type Register = z.infer<typeof RegisterSchema>;
 export type StudentCreateForm = z.infer<typeof StudentCreateSchema>;
@@ -165,3 +175,4 @@ export type ReaderCreateForm = z.infer<typeof ReaderCreateSchema>;
 export type ReaderUpdateForm = z.infer<typeof ReaderUpdateSchema>;
 export type AttendanceCraeteForm = z.infer<typeof AttendanceCreateSchema>;
 export type AttendanceUpdateForm = z.infer<typeof AttendanceUpdateSchema>;
+export type UserUpdateForm = z.infer<typeof UserUpdateSchema>;

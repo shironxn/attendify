@@ -14,38 +14,44 @@ export async function getAuth() {
     const cookie = await cookies();
     const token = cookie.get("token")?.value;
 
-    const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_KEY);
-    const { payload } = await jose.jwtVerify(token!, secret);
+    if (!token) {
+      throw new Error("Token not found");
+    }
 
-    const id = Number(typeof payload === "object" && payload["id"]);
+    const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_KEY);
+    const { payload } = await jose.jwtVerify(token, secret);
+
+    const id = Number(payload?.id);
+    if (isNaN(id)) {
+      throw new Error("Invalid token payload");
+    }
+
     const data = await prisma.user.findUnique({
-      where: { id: id },
+      where: { id },
     });
+
+    if (!data) {
+      throw new Error("User not found");
+    }
 
     return { data };
   } catch (error) {
-    console.error("Unexpected error in getAuth:", error);
-
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return { error: error.message };
-    }
-
-    return { error: "An unexpected error occurred while fetching auth data" };
+    console.error("Error in getAuth:", error);
+    return { error: "An unexpected error occurred" };
   }
 }
 
 export async function login(data: Login) {
   try {
     const cookie = await cookies();
-
     const user = await prisma.user.findFirst({ where: { email: data.email } });
     if (!user) {
-      throw new Error("invalid user");
+      throw new Error("User not found");
     }
 
-    const passwordCompare = await compare(data.password, user?.password);
-    if (!passwordCompare) {
-      throw new Error("invalid user password");
+    const passwordMatch = await compare(data.password, user.password);
+    if (!passwordMatch) {
+      throw new Error("Invalid password");
     }
 
     const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_KEY);
@@ -63,37 +69,40 @@ export async function login(data: Login) {
       httpOnly: true,
       sameSite: "strict",
     });
+
+    redirect("/dashboard");
   } catch (error) {
-    console.error("Unexpected error in login:", error);
-
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError ||
-      error instanceof Error
-    ) {
-      return { error: error.message };
-    }
-
-    return { error: "An unexpected error occurred while logging in" };
+    console.error("Error during login:", error);
+    return {
+      error: "An unexpected error occurred during login",
+    };
   }
-
-  redirect("/dashboard");
 }
 
 export async function register(data: Register) {
   try {
     data.password = await hash(data.password, 10);
-    await prisma.user.create({ data });
+
+    await prisma.user.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      },
+    });
+
+    redirect("/login");
   } catch (error) {
-    console.error("Unexpected error in register:", error);
+    console.error("Error during registration:", error);
 
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return { error: error.message };
+      if (error.code === "P2002") {
+        return { error: "Email is already in use" };
+      }
     }
 
     return { error: "An unexpected error occurred during registration" };
   }
-
-  redirect("/login");
 }
 
 export async function logout() {
@@ -101,13 +110,13 @@ export async function logout() {
     const cookie = await cookies();
     if (!cookie.has("token")) {
       return {
-        error: "token not found",
+        error: "Token not found",
       };
     }
 
     cookie.delete("token");
   } catch (error) {
-    console.error("Unexpected error in logout:", error);
+    console.error("Error during logout:", error);
 
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return { error: error.message };

@@ -61,7 +61,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -316,18 +315,18 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
         ))}
       </div>
 
-      <div className="grid grid-cols-6 gap-4 items-center">
-        <Input
-          placeholder="Cari Siswa"
-          className="col-span-2"
-          onChange={(e) => setSearch(e.target.value)}
-        />
-
-        <div>
-          <Button size={"icon"} onClick={() => setOpenAdd(true)}><PlusCircleIcon /></Button>
+      <div className="grid grid-cols-6 gap-4">
+        <div className="col-span-6 md:col-span-2 flex gap-4">
+          <Input
+            placeholder="Cari Siswa"
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <div>
+            <Button size={"icon"} onClick={() => setOpenAdd(true)}><PlusCircleIcon /></Button>
+          </div>
         </div>
 
-        <div className="col-start-4">
+        <div className="col-span-2 md:col-span-1 md:col-start-4">
           <DropdownMenu>
             <DropdownMenuTrigger className="flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1">
               {kelas ? kelas : "Kelas"}<CaretSortIcon className="h-4 w-4 opacity-50" />
@@ -362,7 +361,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
           </DropdownMenu>
         </div>
 
-        <div className="col-start-5">
+        <div className="col-span-2 md:col-span-1 md:col-start-5">
           <Select onValueChange={setTime}>
             <SelectTrigger>
               <SelectValue placeholder="Hari ini" />
@@ -374,7 +373,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
           </Select>
         </div>
 
-        <div className="col-start-6">
+        <div className="col-span-2 md:col-span-1 md:col-start-6">
           <Select onValueChange={setStatus}>
             <SelectTrigger>
               <SelectValue placeholder="Status" />
@@ -652,7 +651,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
             </section>
           </div>
 
-          <DialogFooter className="gap-2">
+          <DialogFooter className="gap-4">
             <DialogClose asChild>
               <Button type="button" variant="secondary">
                 Tutup

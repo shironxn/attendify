@@ -119,7 +119,6 @@ const inputField = [
   }
 ]
 
-
 export function ControlStudent({ student }: { student: StudentWithCard[] }) {
   const [data, setData] = useState<StudentWithCard[]>(student)
   const [filteredData, setFilteredData] = useState<StudentWithCard[] | undefined>([]);
@@ -195,22 +194,20 @@ export function ControlStudent({ student }: { student: StudentWithCard[] }) {
     }
   }, [openEdit, formEdit]);
 
-
-
   async function onSubmit(data: StudentCreateForm | StudentUpdateForm, type: "tambah" | "update") {
-    const res = type === "tambah" ? await createStudent(data as StudentCreateForm) : await updateStudent(data as StudentUpdateForm)
+    const res = type === "tambah" ? await createStudent(data as StudentCreateForm) : await updateStudent(data as StudentUpdateForm);
 
     if (res?.error) {
       toast({
-        title: "Error",
+        title: "Terjadi Kesalahan",
         description: res.error,
         variant: "destructive"
-      })
-      return
+      });
+      return;
     }
 
     if (type === "tambah") {
-      formAdd.reset()
+      formAdd.reset();
       setOpenAdd(false);
     } else {
       setOpenEdit(null);
@@ -218,26 +215,26 @@ export function ControlStudent({ student }: { student: StudentWithCard[] }) {
 
     toast({
       title: "Sukses",
-      description: `Berhasil ${type} siswa`
-    })
-
+      description: `Berhasil ${type === "tambah" ? "menambahkan" : "memperbarui"} siswa.`
+    });
   }
 
   async function onDelete(id: number) {
-    const res = await deleteStudent(id)
+    const res = await deleteStudent(id);
 
     if (res?.error) {
       toast({
-        title: "Error",
-        description: res.error
-      })
-      return
+        title: "Terjadi Kesalahan",
+        description: res.error,
+        variant: "destructive"
+      });
+      return;
     }
 
     toast({
       title: "Sukses",
-      description: "Berhasil menghapus student"
-    })
+      description: "Berhasil menghapus siswa."
+    });
   }
 
   return (
@@ -248,18 +245,19 @@ export function ControlStudent({ student }: { student: StudentWithCard[] }) {
           <CardDescription> Kelola data siswa dengan mudah.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-8">
-          <div className="grid gap-4 grid-cols-6">
-            <Input
-              placeholder="Cari Siswa"
-              className="col-span-2"
-              onChange={(e) => setSearch(e.target.value)}
-            />
+          <div className="grid grid-cols-6 gap-4">
+            <div className="flex gap-4 col-span-6 md:col-span-2">
+              <Input
+                placeholder="Cari Siswa"
+                onChange={(e) => setSearch(e.target.value)}
+              />
 
-            <div>
-              <Button size={"icon"} onClick={() => setOpenAdd(true)}><PlusCircleIcon /></Button>
+              <div>
+                <Button size={"icon"} onClick={() => setOpenAdd(true)}><PlusCircleIcon /></Button>
+              </div>
             </div>
 
-            <div className="col-start-6">
+            <div className="col-span-2 md:col-span-1 md:col-start-6">
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1">Kelas<CaretSortIcon className="h-4 w-4 opacity-50" />
                 </DropdownMenuTrigger>
@@ -408,7 +406,7 @@ export function ControlStudent({ student }: { student: StudentWithCard[] }) {
                 <FormField
                   key={index}
                   control={formAdd.control}
-                  name={item.name as "name" || "nis" || "phone_number" || "class"}
+                  name={item.name as keyof StudentCreateForm}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{item.label}</FormLabel>
@@ -485,7 +483,7 @@ export function ControlStudent({ student }: { student: StudentWithCard[] }) {
           </div>
 
 
-          <DialogFooter>
+          <DialogFooter className="gap-4">
             <DialogClose asChild>
               <Button type="button" variant="secondary">
                 Tutup
@@ -528,7 +526,7 @@ export function ControlStudent({ student }: { student: StudentWithCard[] }) {
                 <FormField
                   key={index}
                   control={formEdit.control}
-                  name={item.name as "name" || "nis" || "phone_number" || "class"}
+                  name={item.name as keyof StudentUpdateForm}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{item.label}</FormLabel>

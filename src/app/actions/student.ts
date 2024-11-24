@@ -20,15 +20,20 @@ export async function createStudent(data: StudentCreateForm) {
       data: {
         rfid: BigInt(Number(data.rfid)),
         student: {
-          connect: {
-            id: student.id,
-          },
+          connect: { id: student.id },
         },
       },
     });
   } catch (error) {
+    console.error("Error creating student:", error);
+
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return { error: error.message };
+      switch (error.code) {
+        case "P2002":
+          return { error: "NISN or phone number is already in use." };
+        default:
+          return { error: error.message };
+      }
     }
 
     return { error: "An unexpected error occurred while creating student." };
@@ -39,33 +44,13 @@ export async function createStudent(data: StudentCreateForm) {
 
 export async function getStudent() {
   try {
-    const data = await prisma.student.findMany({
-      orderBy: {
-        createdAt: "asc",
-      },
-      include: {
-        card: true,
-      },
+    return await prisma.student.findMany({
+      orderBy: { createdAt: "asc" },
+      include: { card: true },
     });
-    return { data };
   } catch (error) {
-    console.error("Failed to fetch students:", error);
+    console.error("Error fetching students:", error);
 
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      throw new Error(error.message);
-    }
-
-    throw new Error(
-      "An unexpected error occurred while fetching student data.",
-    );
-  }
-}
-
-export async function getStudentByID(id: number) {
-  try {
-    const data = await prisma.student.findUnique({ where: { id } });
-    return { data };
-  } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       throw new Error(error.message);
     }
@@ -98,11 +83,13 @@ export async function getStudentByName(name: string) {
     });
 
     if (data.length === 0) {
-      return { error: "Nama siswa tidak ditemukan" };
+      return { error: "Student name not found." };
     }
 
     return { data };
   } catch (error) {
+    console.error("Error fetching student by name:", error);
+
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return { error: error.message };
     }
@@ -124,17 +111,25 @@ export async function updateStudent(data: StudentUpdateForm) {
       },
       where: { id: Number(data.id) },
     });
+
     if (data.rfid) {
       await prisma.card.update({
-        data: {
-          rfid: BigInt(Number(data.rfid)),
-        },
+        data: { rfid: BigInt(Number(data.rfid)) },
         where: { studentId: Number(data.id) },
       });
     }
   } catch (error) {
+    console.error("Error updating student:", error);
+
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return { error: error.message };
+      switch (error.code) {
+        case "P2025":
+          return { error: "Student not found." };
+        case "P2002":
+          return { error: "NISN or phone number is already in use." };
+        default:
+          return { error: error.message };
+      }
     }
 
     return { error: "An unexpected error occurred while updating student." };
@@ -147,8 +142,15 @@ export async function deleteStudent(id: number) {
   try {
     await prisma.student.delete({ where: { id } });
   } catch (error) {
+    console.error("Error deleting student:", error);
+
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return { error: error.message };
+      switch (error.code) {
+        case "P2025":
+          return { error: "Student not found." };
+        default:
+          return { error: error.message };
+      }
     }
 
     return { error: "An unexpected error occurred while deleting student." };

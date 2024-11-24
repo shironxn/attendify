@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import djs from "@/lib/dayjs";
-import { Reader, User } from "@prisma/client";
+import { Mode, Reader, User } from "@prisma/client";
 import { useEffect, useState } from "react";
 import {
   PlusCircleIcon,
@@ -63,6 +63,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ReaderCreateForm, ReaderCreateSchema, ReaderUpdateForm, ReaderUpdateSchema } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createReader, deleteReader, updateReader } from "@/app/actions/reader";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const inputField = [
   {
@@ -78,6 +79,8 @@ const inputField = [
 ];
 
 export function ControlReader({ data, user }: { data: Reader[], user: User }) {
+  const [filteredData, setFilteredData] = useState<Reader[] | undefined>(data);
+  const [mode, setMode] = useState<Mode | string>("")
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState<Reader | null>(null);
   const [openDelete, setOpenDelete] = useState<number | null>(null);
@@ -103,6 +106,12 @@ export function ControlReader({ data, user }: { data: Reader[], user: User }) {
   })
 
   useEffect(() => {
+    if (mode !== "semua") {
+      setFilteredData(data.filter(item => item.mode.includes(mode)))
+    }
+  }, [mode, data])
+
+  useEffect(() => {
     if (openEdit) {
       formEdit.reset({
         id: String(openEdit.id),
@@ -113,23 +122,21 @@ export function ControlReader({ data, user }: { data: Reader[], user: User }) {
     }
   }, [openEdit, formEdit]);
 
-
-
   async function onSubmit(data: ReaderCreateForm | ReaderUpdateForm, type: "tambah" | "update") {
-    data.user_id = String(user.id)
-    const res = type === "tambah" ? await createReader(data as ReaderCreateForm) : await updateReader(data as ReaderUpdateForm)
+    data.user_id = String(user.id);
+    const res = type === "tambah" ? await createReader(data as ReaderCreateForm) : await updateReader(data as ReaderUpdateForm);
 
     if (res?.error) {
       toast({
-        title: "Error",
+        title: "Terjadi Kesalahan",
         description: res.error,
-        variant: "destructive"
-      })
-      return
+        variant: "destructive",
+      });
+      return;
     }
 
     if (type === "tambah") {
-      formAdd.reset()
+      formAdd.reset();
       setOpenAdd(false);
     } else {
       setOpenEdit(null);
@@ -137,27 +144,29 @@ export function ControlReader({ data, user }: { data: Reader[], user: User }) {
 
     toast({
       title: "Sukses",
-      description: `Berhasil ${type} reader`
-    })
-
+      description: `Berhasil ${type === "tambah" ? "menambahkan" : "memperbarui"} reader.`,
+    });
   }
 
+
   async function onDelete(id: number) {
-    const res = await deleteReader(id)
+    const res = await deleteReader(id);
 
     if (res?.error) {
       toast({
-        title: "Error",
-        description: res.error
-      })
-      return
+        title: "Terjadi Kesalahan",
+        description: res.error,
+        variant: "destructive"
+      });
+      return;
     }
 
     toast({
       title: "Sukses",
-      description: "Berhasil menghapus reader"
-    })
+      description: "Berhasil menghapus reader."
+    });
   }
+
 
   return (
     <>
@@ -170,15 +179,32 @@ export function ControlReader({ data, user }: { data: Reader[], user: User }) {
         </CardHeader>
         <CardContent className="space-y-8">
           <div className="grid gap-4 grid-cols-6">
-            <div>
-              <Button
-                type="reset"
-                onClick={() => {
-                  setOpenAdd(true);
-                }}
-              >
-                Tambah<PlusCircleIcon />
-              </Button>
+            <div className="flex gap-4 col-span-6 md:col-span-2">
+              <Select onValueChange={setMode}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Mode" />
+                </SelectTrigger>
+                <SelectContent>
+                  {["ACTIVE", "INACTIVE"].map((item, index) => (
+                    <SelectItem value={item} key={index}>
+                      {item.slice(0, 1) + item.slice(1).toLowerCase()}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="semua">
+                    Semua
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <div>
+                <Button
+                  onClick={() => {
+                    setOpenAdd(true);
+                  }}
+                  size={"icon"}
+                >
+                  <PlusCircleIcon />
+                </Button>
+              </div>
             </div>
           </div>
           <Table>
@@ -192,35 +218,36 @@ export function ControlReader({ data, user }: { data: Reader[], user: User }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data?.map((item, index) => (
-                <ContextMenu key={index}>
-                  <ContextMenuTrigger asChild>
-                    <TableRow key={index}>
-                      <TableCell className="font-medium">{item.id}</TableCell>
-                      <TableCell>{item.mode}</TableCell>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell>{item.location}</TableCell>
-                      <TableCell className="text-right">
-                        {djs(item.createdAt).format("YYYY-MM-DD HH:mm:ss")}
-                      </TableCell>
-                    </TableRow>
-                  </ContextMenuTrigger>
-                  <ContextMenuContent>
-                    <ContextMenuItem onClick={() => setOpenEdit(item)}>
-                      Edit
-                      <ContextMenuShortcut>
-                        <SquarePenIcon className="w-4 h-4" />
-                      </ContextMenuShortcut>
-                    </ContextMenuItem>
-                    <ContextMenuItem onClick={() => setOpenDelete(item.id)}>
-                      Hapus
-                      <ContextMenuShortcut>
-                        <Trash2Icon className="w-4 h-4" />
-                      </ContextMenuShortcut>
-                    </ContextMenuItem>
-                  </ContextMenuContent>
-                </ContextMenu>
-              ))}
+              {
+                filteredData?.map((item, index) => (
+                  <ContextMenu key={index}>
+                    <ContextMenuTrigger asChild>
+                      <TableRow key={index}>
+                        <TableCell className="font-medium">{item.id}</TableCell>
+                        <TableCell>{item.mode}</TableCell>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell>{item.location}</TableCell>
+                        <TableCell className="text-right">
+                          {djs(item.createdAt).format("YYYY-MM-DD HH:mm:ss")}
+                        </TableCell>
+                      </TableRow>
+                    </ContextMenuTrigger>
+                    <ContextMenuContent>
+                      <ContextMenuItem onClick={() => setOpenEdit(item)}>
+                        Edit
+                        <ContextMenuShortcut>
+                          <SquarePenIcon className="w-4 h-4" />
+                        </ContextMenuShortcut>
+                      </ContextMenuItem>
+                      <ContextMenuItem onClick={() => setOpenDelete(item.id)}>
+                        Hapus
+                        <ContextMenuShortcut>
+                          <Trash2Icon className="w-4 h-4" />
+                        </ContextMenuShortcut>
+                      </ContextMenuItem>
+                    </ContextMenuContent>
+                  </ContextMenu>
+                ))}
             </TableBody>
           </Table>
         </CardContent>

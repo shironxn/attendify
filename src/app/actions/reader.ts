@@ -9,21 +9,28 @@ export async function createReader(data: ReaderCreateForm) {
   try {
     await prisma.reader.create({
       data: {
-        name: data.name,
+        name: data.name.toUpperCase(),
         location: data.location,
         user: {
-          connect: {
-            id: Number(data.user_id),
-          },
+          connect: { id: Number(data.user_id) },
         },
       },
     });
   } catch (error) {
+    console.error("Error creating reader:", error);
+
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return { error: error.message };
+      switch (error.code) {
+        case "P2002":
+          return { error: "Reader name already exists." };
+        case "P2025":
+          return { error: "User not found." };
+        default:
+          return { error: error.message };
+      }
     }
 
-    return { error: "An unexpected error occurred while creating reader." };
+    return { error: "An unexpected error occurred while creating the reader." };
   }
 
   revalidatePath("/dashboard");
@@ -31,40 +38,13 @@ export async function createReader(data: ReaderCreateForm) {
 
 export async function getReader() {
   try {
-    const data = await prisma.reader.findMany({
-      orderBy: {
-        createdAt: "asc",
-      },
-      include: {
-        attendances: true,
-        user: true,
-      },
-    });
-    return { data };
-  } catch (error) {
-    console.error("Failed to fetch readers:", error);
-
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      throw new Error(error.message);
-    }
-
-    throw new Error("An unexpected error occurred while fetching readers.");
-  }
-}
-
-export async function getReaderByID(id: number) {
-  try {
-    const data = await prisma.reader.findUnique({
-      where: { id },
+    return await prisma.reader.findMany({
+      orderBy: { createdAt: "asc" },
       include: { attendances: true, user: true },
     });
-    return { data };
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      throw new Error(error.message);
-    }
-
-    throw new Error("An unexpected error occurred while fetching reader data.");
+    console.error("Error fetching readers:", error);
+    throw new Error("An unexpected error occurred while fetching readers.");
   }
 }
 
@@ -72,18 +52,27 @@ export async function updateReader(data: ReaderUpdateForm) {
   try {
     await prisma.reader.update({
       data: {
-        name: data.name,
+        name: String(data.name).toUpperCase(),
         location: data.location,
         mode: data.mode as Mode,
       },
       where: { id: Number(data.id) },
     });
   } catch (error) {
+    console.error("Error updating reader:", error);
+
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return { error: error.message };
+      switch (error.code) {
+        case "P2025":
+          return { error: "Reader not found." };
+        case "P2002":
+          return { error: "Reader name already exists." };
+        default:
+          return { error: error.message };
+      }
     }
 
-    return { error: "An unexpected error occurred while updating reader." };
+    return { error: "An unexpected error occurred while updating the reader." };
   }
 
   revalidatePath("/dashboard");
@@ -93,11 +82,18 @@ export async function deleteReader(id: number) {
   try {
     await prisma.reader.delete({ where: { id } });
   } catch (error) {
+    console.error("Error deleting reader:", error);
+
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return { error: error.message };
+      switch (error.code) {
+        case "P2025":
+          return { error: "Reader not found." };
+        default:
+          return { error: error.message };
+      }
     }
 
-    return { error: "An unexpected error occurred while deleting reader." };
+    return { error: "An unexpected error occurred while deleting the reader." };
   }
 
   revalidatePath("/dashboard");
