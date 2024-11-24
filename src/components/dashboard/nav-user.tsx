@@ -40,7 +40,6 @@ export function NavUser({
   user: {
     name: string
     email: string
-    avatar: LucideIcon
   }
 }) {
   const { isMobile } = useSidebar()

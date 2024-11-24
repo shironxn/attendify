@@ -110,16 +110,15 @@ export async function POST(request: Request) {
         break;
     }
 
-    const payload = {
-      chatId: `${attendance.student.phone_number}@c.us`,
-      message,
-    };
     await fetch(String(process.env.NEXT_PUBLIC_WHATSAPP_API_URL), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        chatId: `${attendance.student.phone_number}@c.us`,
+        message,
+      }),
     });
 
     return Response.json(

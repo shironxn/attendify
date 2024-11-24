@@ -50,7 +50,7 @@ export function AreaChartComponent({ data }: { data: ChartData }) {
       date: item.date,
       hadir: item.data.reduce(
         (acc, curr) =>
-          ["hadir", "telat"].includes(curr.status) ? acc + curr.count : acc,
+          ["hadir", "telat", "dispen"].includes(curr.status) ? acc + curr.count : acc,
         0
       ),
       tidakHadir: item.data.reduce(

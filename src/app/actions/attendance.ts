@@ -2,7 +2,8 @@
 
 import djs from "@/lib/dayjs";
 import { prisma } from "@/lib/prisma";
-import { Attendance, Prisma } from "@prisma/client";
+import { AttendanceCraeteForm, AttendanceUpdateForm } from "@/lib/types";
+import { Prisma, Status } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export async function getAttendance() {
@@ -24,11 +25,97 @@ export async function getAttendance() {
   }
 }
 
-export async function createAttendance(data: Prisma.AttendanceCreateInput) {
+export async function createAttendance(data: AttendanceCraeteForm) {
   try {
-    await prisma.attendance.create({
-      data,
+    const now = djs();
+    const exitTime = now.hour(15);
+
+    const student = await prisma.student.findUnique({
+      where: {
+        nisn: BigInt(data.nisn),
+      },
     });
+
+    if (!student) {
+      return;
+    }
+
+    const todaysAttendance = await prisma.attendance.findMany({
+      where: {
+        studentId: student.id,
+        createdAt: {
+          gte: now.startOf("day").toDate(),
+          lt: now.endOf("day").toDate(),
+        },
+      },
+    });
+
+    const hasCheckedIn = todaysAttendance.some(
+      (item) => item.status !== "PULANG",
+    );
+    const hasCheckedOut = todaysAttendance.some(
+      (item) => item.status === "PULANG",
+    );
+
+    if (now.isSameOrAfter(exitTime)) {
+      if (hasCheckedOut) {
+        return Response.json(
+          {
+            message: `Presensi pulang sudah tercatat untuk ${student.name}.`,
+            data: {
+              name: student.name,
+              status,
+            },
+          },
+          { status: 409 },
+        );
+      }
+    } else {
+      if (hasCheckedIn) {
+        return Response.json(
+          {
+            message: `Presensi sudah tercatat untuk ${student.name}. Tidak dapat melakukan presensi lagi.`,
+            data: {
+              name: student.name,
+              status,
+            },
+          },
+          { status: 409 },
+        );
+      }
+    }
+
+    const attendance = await prisma.attendance.create({
+      data: {
+        studentId: student?.id,
+        status: data.status as Status,
+        description: data.description,
+      },
+    });
+
+    let message;
+    switch (data.status) {
+      case "HADIR":
+        message = `Anak Anda, ${student.name}, telah sampai di SMAN 48 Jakarta dengan selamat pada ${djs(attendance.createdAt).format("LLL")}. Terima kasih.`;
+        break;
+      case "TELAT":
+        message = `Anak Anda, ${student.name}, terlambat datang ke SMAN 48 Jakarta pada ${djs(attendance.createdAt).format("LLL")}. Mohon konfirmasi alasan keterlambatan kepada wali kelas atau pihak sekolah. Terima kasih.`;
+        break;
+      case "PULANG":
+        message = `Anak Anda, ${student.name}, telah meninggalkan SMAN 48 Jakarta dengan selamat pada ${djs(attendance.createdAt).format("LLL")}. Terima kasih.`;
+        break;
+    }
+
+    //await fetch(String(process.env.NEXT_PUBLIC_WHATSAPP_API_URL), {
+    //  method: "POST",
+    //  headers: {
+    //    "Content-Type": "application/json",
+    //  },
+    //  body: JSON.stringify({
+    //    chatId: `${student.phone_number}@c.us`,
+    //    message,
+    //  }),
+    //});
   } catch (error) {
     console.error("Unexpected error in createAttendance:", error);
 
@@ -42,14 +129,14 @@ export async function createAttendance(data: Prisma.AttendanceCreateInput) {
   revalidatePath("/dashboard");
 }
 
-export async function updateAttendance(data: Attendance) {
+export async function updateAttendance(data: AttendanceUpdateForm) {
   try {
     await prisma.attendance.update({
       data: {
-        status: data.status,
+        status: data.status as Status,
         description: data.description,
       },
-      where: { id: data.id },
+      where: { id: Number(data.id) },
     });
   } catch (error) {
     console.error("Unexpected error in updateAttendance:", error);

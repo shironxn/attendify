@@ -95,7 +95,7 @@ export function PieChartComponent({ data }: { data: ChartData }) {
     return (
       acc +
       item.data.reduce((subAcc, curr) => {
-        if (curr.status === "hadir" && typeof curr.count === "number") {
+        if (["hadir", "telat", "dispen"].includes(curr.status) && typeof curr.count === "number") {
           return subAcc + curr.count;
         }
         return subAcc;

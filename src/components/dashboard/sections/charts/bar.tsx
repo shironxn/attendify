@@ -43,7 +43,7 @@ export function BarChartComponent({ data }: { data: ChartData }) {
         date: item.date,
         hadir: item.data.reduce(
           (acc, curr) =>
-            ["hadir", "telat"].includes(curr.status) ? acc + curr.count : acc,
+            ["hadir", "telat", "dispen"].includes(curr.status) ? acc + curr.count : acc,
           0
         ),
         tidakHadir: item.data.reduce(
@@ -70,7 +70,7 @@ export function BarChartComponent({ data }: { data: ChartData }) {
   return (
     <Card>
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
+        <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6 text-center sm:text-left">
           <CardTitle>Grafik Kehadiran</CardTitle>
           <CardDescription>
             Data kehadiran siswa selama 7 hari terakhir.

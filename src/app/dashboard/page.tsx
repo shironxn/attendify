@@ -26,6 +26,9 @@ import { BotIcon, ChartLineIcon, Settings2Icon, SquareTerminalIcon } from "lucid
 import Link from "next/link"
 import { getAttendance, getAttendanceCount } from "../actions/attendance"
 import { StatsSection } from "@/components/dashboard/sections/stats"
+import { getStudent } from "../actions/student"
+import { ControlSection } from "@/components/dashboard/sections/control"
+import { getReader } from "../actions/reader"
 
 const navList = [
   {
@@ -62,6 +65,8 @@ export default async function Dashboard(props: { searchParams?: Promise<{ sectio
   const user = await getAuth()
   const attendance = await getAttendance()
   const chart = await getAttendanceCount()
+  const stundent = await getStudent()
+  const reader = await getReader()
 
   return (
     <SidebarProvider>
@@ -115,6 +120,7 @@ export default async function Dashboard(props: { searchParams?: Promise<{ sectio
             </div>}
           {section === "monitor" && <MonitorSection attendance={attendance} />}
           {section === "stats" && <StatsSection data={chart} />}
+          {user.data && section === "control" && <ControlSection student={stundent.data} reader={reader.data} user={user.data} />}
         </div>
       </SidebarInset>
     </SidebarProvider>

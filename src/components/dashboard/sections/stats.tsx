@@ -15,7 +15,7 @@ export type ChartData = {
 
 export function StatsSection({ data }: { data: ChartData }) {
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
       <PieChartComponent data={data} />
       <BarChartComponent data={data} />
       <div className="col-span-1 lg:col-span-2">

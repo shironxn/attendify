@@ -66,7 +66,10 @@ export async function login(data: Login) {
   } catch (error) {
     console.error("Unexpected error in login:", error);
 
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError ||
+      error instanceof Error
+    ) {
       return { error: error.message };
     }
 

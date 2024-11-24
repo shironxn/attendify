@@ -2,16 +2,31 @@
 
 import djs from "@/lib/dayjs";
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { StudentCreateForm, StudentUpdateForm } from "@/lib/types";
+import { Class, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
-export async function createStudent(data: Prisma.StudentCreateInput) {
+export async function createStudent(data: StudentCreateForm) {
   try {
-    data.name.toUpperCase();
-    await prisma.student.create({ data });
+    const student = await prisma.student.create({
+      data: {
+        name: data.name.toUpperCase(),
+        class: data.class as Class,
+        nisn: BigInt(data.nisn),
+        phone_number: BigInt(data.phone_number),
+      },
+    });
+    await prisma.card.create({
+      data: {
+        rfid: BigInt(Number(data.rfid)),
+        student: {
+          connect: {
+            id: student.id,
+          },
+        },
+      },
+    });
   } catch (error) {
-    console.error("Unexpected error in createStudent:", error);
-
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return { error: error.message };
     }
@@ -24,7 +39,14 @@ export async function createStudent(data: Prisma.StudentCreateInput) {
 
 export async function getStudent() {
   try {
-    const data = await prisma.student.findMany();
+    const data = await prisma.student.findMany({
+      orderBy: {
+        createdAt: "asc",
+      },
+      include: {
+        card: true,
+      },
+    });
     return { data };
   } catch (error) {
     console.error("Failed to fetch students:", error);
@@ -44,8 +66,6 @@ export async function getStudentByID(id: number) {
     const data = await prisma.student.findUnique({ where: { id } });
     return { data };
   } catch (error) {
-    console.error("Failed to fetch student by id:", error);
-
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       throw new Error(error.message);
     }
@@ -83,8 +103,6 @@ export async function getStudentByName(name: string) {
 
     return { data };
   } catch (error) {
-    console.error("Failed to fetch student by name:", error);
-
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return { error: error.message };
     }
@@ -95,18 +113,26 @@ export async function getStudentByName(name: string) {
   }
 }
 
-export async function updateStudent(
-  data: Prisma.StudentUpdateInput,
-  id: number,
-) {
+export async function updateStudent(data: StudentUpdateForm) {
   try {
     await prisma.student.update({
-      data,
-      where: { id },
+      data: {
+        name: data.name,
+        class: data.class as Class,
+        nisn: BigInt(Number(data.nisn)),
+        phone_number: BigInt(Number(data.phone_number)),
+      },
+      where: { id: Number(data.id) },
     });
+    if (data.rfid) {
+      await prisma.card.update({
+        data: {
+          rfid: BigInt(Number(data.rfid)),
+        },
+        where: { studentId: Number(data.id) },
+      });
+    }
   } catch (error) {
-    console.error("Unexpected error in updateStudent:", error);
-
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return { error: error.message };
     }
@@ -121,8 +147,6 @@ export async function deleteStudent(id: number) {
   try {
     await prisma.student.delete({ where: { id } });
   } catch (error) {
-    console.error("Unexpected error in deleteStudent:", error);
-
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return { error: error.message };
     }
