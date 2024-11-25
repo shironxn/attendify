@@ -64,7 +64,7 @@ export async function createAttendance(data: AttendanceCraeteForm) {
             message: `Presensi pulang sudah tercatat untuk ${student.name}.`,
             data: {
               name: student.name,
-              status,
+              status: data.status,
             },
           },
           { status: 409 },
@@ -77,7 +77,7 @@ export async function createAttendance(data: AttendanceCraeteForm) {
             message: `Presensi sudah tercatat untuk ${student.name}. Tidak dapat melakukan presensi lagi.`,
             data: {
               name: student.name,
-              status,
+              status: data.status,
             },
           },
           { status: 409 },

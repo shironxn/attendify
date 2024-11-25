@@ -249,7 +249,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
       formEdit.reset({
         id: String(openEdit.id),
         status: openEdit.status,
-        description: String(openEdit.description) ?? ""
+        description: String(openEdit.description)
       })
     }
   }, [openEdit, formEdit])
@@ -508,7 +508,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
                     <FormLabel>nis</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Masukkan nis siswa (10 digit)"
+                        placeholder="Masukkan nis siswa (5 digit)"
                         value={field.value || ""}
                         onChange={e => formAdd.setValue("nis", e.target.value)}
                       />
@@ -738,7 +738,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
                     <FormLabel>Keterangan</FormLabel>
                     <FormControl>
                       <Input
-                        value={field.value || ""}
+                        value={field.value || openEdit?.description || ""}
                         onChange={e => formEdit.setValue("description", e.target.value)}
                       />
                     </FormControl>

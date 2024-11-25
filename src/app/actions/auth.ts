@@ -15,15 +15,21 @@ export async function getAuth() {
     const token = cookie.get("token")?.value;
 
     if (!token) {
-      throw new Error("Token not found");
+      return { error: "Token not found" };
     }
 
     const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_KEY);
-    const { payload } = await jose.jwtVerify(token, secret);
+    let payload;
+    try {
+      ({ payload } = await jose.jwtVerify(token, secret));
+    } catch (jwtError) {
+      console.error("JWT verification failed:", jwtError);
+      return { error: "Invalid token" };
+    }
 
     const id = Number(payload?.id);
     if (isNaN(id)) {
-      throw new Error("Invalid token payload");
+      return { error: "Invalid token payload" };
     }
 
     const data = await prisma.user.findUnique({
@@ -31,7 +37,7 @@ export async function getAuth() {
     });
 
     if (!data) {
-      throw new Error("User not found");
+      return { error: "User not found" };
     }
 
     return { data };
@@ -46,12 +52,12 @@ export async function login(data: Login) {
     const cookie = await cookies();
     const user = await prisma.user.findFirst({ where: { email: data.email } });
     if (!user) {
-      throw new Error("User not found");
+      return { error: "User not found" };
     }
 
     const passwordMatch = await compare(data.password, user.password);
     if (!passwordMatch) {
-      throw new Error("Invalid password");
+      return { error: "Invalid password" };
     }
 
     const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_KEY);
@@ -90,8 +96,6 @@ export async function register(data: Register) {
         password: data.password,
       },
     });
-
-    redirect("/login");
   } catch (error) {
     console.error("Error during registration:", error);
 
@@ -103,6 +107,8 @@ export async function register(data: Register) {
 
     return { error: "An unexpected error occurred during registration" };
   }
+
+  redirect("/login");
 }
 
 export async function logout() {
