@@ -103,9 +103,9 @@ const inputField = [
     placeholder: "Misalnya: X1"
   },
   {
-    name: "nisn",
-    label: "NISN",
-    placeholder: "Nomor Induk Siswa Nasional (10 digit)"
+    name: "nis",
+    label: "NIS",
+    placeholder: "Nomor Induk Siswa (5 digit)"
   },
   {
     name: "phone_number",
@@ -140,7 +140,7 @@ export function ControlStudent({ student }: { student: StudentWithCard[] }) {
     defaultValues: {
       name: "",
       class: "",
-      nisn: "",
+      nis: "",
       phone_number: "",
       rfid: ""
     }
@@ -152,7 +152,7 @@ export function ControlStudent({ student }: { student: StudentWithCard[] }) {
       id: "",
       name: "",
       class: "",
-      nisn: "",
+      nis: "",
       phone_number: "",
       rfid: ""
     }
@@ -187,7 +187,7 @@ export function ControlStudent({ student }: { student: StudentWithCard[] }) {
       formEdit.reset({
         id: String(openEdit.id),
         name: openEdit.name,
-        nisn: String(openEdit.nisn),
+        nis: String(openEdit.nis),
         phone_number: String(openEdit.phone_number), class: openEdit.class,
         rfid: String(openEdit.card?.rfid)
       });
@@ -446,7 +446,7 @@ export function ControlStudent({ student }: { student: StudentWithCard[] }) {
                 <Label className="text-muted-foreground">NIS</Label>
                 <Input
                   id="nis"
-                  defaultValue={String(openView?.nisn)}
+                  defaultValue={String(openView?.nis)}
                   readOnly
                   className="col-span-3 bg-muted"
                 />
@@ -497,7 +497,7 @@ export function ControlStudent({ student }: { student: StudentWithCard[] }) {
 === Informasi Siswa ===
 - ID: ${openView.id}
 - Nama: ${openView.name}
-- NIS: ${openView.nisn}
+- NIS: ${openView.nis}
 - Telepon: ${openView.phone_number}
 - Kelas: ${openView.class}
 - RFID: ${openView.card?.rfid}`.trim();

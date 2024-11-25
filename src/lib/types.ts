@@ -48,9 +48,9 @@ export const StudentCreateSchema = z.object({
     )
     .min(1, "Kelas tidak boleh kosong")
     .max(3, "Kelas maksimal 3 karakter"),
-  nisn: z
+  nis: z
     .string()
-    .length(10, "NISN harus memiliki tepat 10 digit")
+    .length(5, "NIS harus memiliki tepat 5 digit")
     .regex(/^\d+$/, "NISN hanya boleh mengandung angka"),
   phone_number: z
     .string()
@@ -82,9 +82,9 @@ export const StudentUpdateSchema = z.object({
     .min(1, "Kelas tidak boleh kosong")
     .max(3, "Kelas maksimal 3 karakter")
     .optional(),
-  nisn: z
+  nis: z
     .string()
-    .length(10, "NISN harus memiliki tepat 10 digit")
+    .length(5, "NIS harus memiliki tepat 5 digit")
     .regex(/^\d+$/, "NISN hanya boleh mengandung angka")
     .optional(),
   phone_number: z
@@ -130,9 +130,9 @@ export const ReaderUpdateSchema = z.object({
 });
 
 export const AttendanceCreateSchema = z.object({
-  nisn: z
+  nis: z
     .string()
-    .length(10, "NISN harus memiliki tepat 10 digit")
+    .length(5, "NIS harus memiliki tepat 5 digit")
     .regex(/^\d+$/, "NISN hanya boleh mengandung angka"),
   status: z
     .string()

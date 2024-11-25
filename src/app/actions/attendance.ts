@@ -32,7 +32,7 @@ export async function createAttendance(data: AttendanceCraeteForm) {
 
     const student = await prisma.student.findUnique({
       where: {
-        nisn: BigInt(data.nisn),
+        nis: BigInt(data.nis),
       },
     });
 
@@ -106,16 +106,16 @@ export async function createAttendance(data: AttendanceCraeteForm) {
         break;
     }
 
-    //await fetch(String(process.env.NEXT_PUBLIC_WHATSAPP_API_URL), {
-    //  method: "POST",
-    //  headers: {
-    //    "Content-Type": "application/json",
-    //  },
-    //  body: JSON.stringify({
-    //    chatId: `${student.phone_number}@c.us`,
-    //    message,
-    //  }),
-    //});
+    await fetch(String(process.env.NEXT_PUBLIC_WHATSAPP_API_URL), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        chatId: `${student.phone_number}@c.us`,
+        message,
+      }),
+    });
   } catch (error) {
     console.error("Unexpected error in createAttendance:", error);
 

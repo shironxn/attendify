@@ -12,7 +12,7 @@ export async function createStudent(data: StudentCreateForm) {
       data: {
         name: data.name.toUpperCase(),
         class: data.class as Class,
-        nisn: BigInt(data.nisn),
+        nis: BigInt(data.nis),
         phone_number: BigInt(data.phone_number),
       },
     });
@@ -30,7 +30,7 @@ export async function createStudent(data: StudentCreateForm) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       switch (error.code) {
         case "P2002":
-          return { error: "NISN or phone number is already in use." };
+          return { error: "nis or phone number is already in use." };
         default:
           return { error: error.message };
       }
@@ -106,7 +106,7 @@ export async function updateStudent(data: StudentUpdateForm) {
       data: {
         name: data.name,
         class: data.class as Class,
-        nisn: BigInt(Number(data.nisn)),
+        nis: BigInt(Number(data.nis)),
         phone_number: BigInt(Number(data.phone_number)),
       },
       where: { id: Number(data.id) },
@@ -126,7 +126,7 @@ export async function updateStudent(data: StudentUpdateForm) {
         case "P2025":
           return { error: "Student not found." };
         case "P2002":
-          return { error: "NISN or phone number is already in use." };
+          return { error: "nis or phone number is already in use." };
         default:
           return { error: error.message };
       }

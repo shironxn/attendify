@@ -161,7 +161,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
   const formAdd = useForm<AttendanceCraeteForm>({
     resolver: zodResolver(AttendanceCreateSchema),
     defaultValues: {
-      nisn: "",
+      nis: "",
       status: "",
       description: "",
     },
@@ -502,15 +502,15 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
             <form onSubmit={formAdd.handleSubmit(data => onSubmit(data, "tambah"))} className="space-y-4">
               <FormField
                 control={formAdd.control}
-                name="nisn"
+                name="nis"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>NISN</FormLabel>
+                    <FormLabel>nis</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Masukkan NISN siswa (10 digit)"
+                        placeholder="Masukkan nis siswa (10 digit)"
                         value={field.value || ""}
-                        onChange={e => formAdd.setValue("nisn", e.target.value)}
+                        onChange={e => formAdd.setValue("nis", e.target.value)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -592,7 +592,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
                 <Label className="text-muted-foreground">NIS</Label>
                 <Input
                   id="nis"
-                  defaultValue={String(openView?.student.nisn)}
+                  defaultValue={String(openView?.student.nis)}
                   readOnly
                   className="col-span-3 bg-muted"
                 />
@@ -665,7 +665,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
 === Informasi Siswa ===
 - ID: ${openView.student.id}
 - Nama: ${openView.student.name}
-- NIS: ${openView.student.nisn}
+- NIS: ${openView.student.nis}
 - Telepon: ${openView.student.phone_number}
 - Kelas: ${openView.student.class}
 
