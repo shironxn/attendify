@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import * as React from "react";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 import {
   Card,
@@ -9,7 +9,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -17,16 +17,16 @@ import {
   ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { ChartData } from "../stats"
-import djs from "@/lib/dayjs"
+} from "@/components/ui/select";
+import { ChartData } from "../stats";
+import djs from "@/lib/dayjs";
 
 const chartConfig = {
   views: {
@@ -40,26 +40,30 @@ const chartConfig = {
     label: "Tidak Hadir",
     color: "hsl(var(--chart-2))",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 export function AreaChartComponent({ data }: { data: ChartData }) {
-  const [timeRange, setTimeRange] = React.useState("30d")
+  const [timeRange, setTimeRange] = React.useState("30d");
 
   const chartData = data.data.map((item) => {
     return {
       date: item.date,
       hadir: item.data.reduce(
         (acc, curr) =>
-          ["hadir", "telat", "dispen"].includes(curr.status) ? acc + curr.count : acc,
+          ["hadir", "telat", "dispen"].includes(curr.status)
+            ? acc + curr.count
+            : acc,
         0
       ),
       tidakHadir: item.data.reduce(
         (acc, curr) =>
-          ["izin", "sakit", "alfa"].includes(curr.status) ? acc + curr.count : acc,
+          ["izin", "sakit", "alfa"].includes(curr.status)
+            ? acc + curr.count
+            : acc,
         0
       ),
-    }
-  })
+    };
+  });
 
   const referenceDate = djs();
   const daysToSubtract = timeRange === "30d" ? 30 : 7;
@@ -76,7 +80,8 @@ export function AreaChartComponent({ data }: { data: ChartData }) {
         <div className="grid flex-1 gap-1 text-center sm:text-left">
           <CardTitle>Visualisasi Kehadiran</CardTitle>
           <CardDescription>
-            Menampilkan total kehadiran untuk {timeRange === "30d" ? "30 hari terakhir" : "7 hari terakhir"}.
+            Menampilkan total kehadiran untuk{" "}
+            {timeRange === "30d" ? "30 hari terakhir" : "7 hari terakhir"}.
           </CardDescription>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
@@ -136,11 +141,11 @@ export function AreaChartComponent({ data }: { data: ChartData }) {
               tickMargin={8}
               minTickGap={32}
               tickFormatter={(value) => {
-                const date = new Date(value)
+                const date = new Date(value);
                 return date.toLocaleDateString("id", {
                   month: "short",
                   day: "numeric",
-                })
+                });
               }}
             />
             <ChartTooltip
@@ -151,7 +156,7 @@ export function AreaChartComponent({ data }: { data: ChartData }) {
                     return new Date(value).toLocaleDateString("id", {
                       month: "short",
                       day: "numeric",
-                    })
+                    });
                   }}
                   indicator="dot"
                 />
@@ -176,6 +181,5 @@ export function AreaChartComponent({ data }: { data: ChartData }) {
         </ChartContainer>
       </CardContent>
     </Card>
-  )
+  );
 }
-

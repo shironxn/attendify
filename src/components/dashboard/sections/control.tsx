@@ -10,7 +10,15 @@ export type StudentWithCard = Prisma.StudentGetPayload<{
   };
 }>;
 
-export function ControlSection({ student, reader, user }: { student: StudentWithCard[], reader: Reader[], user: User }) {
+export function ControlSection({
+  student,
+  reader,
+  user,
+}: {
+  student: StudentWithCard[];
+  reader: Reader[];
+  user: User;
+}) {
   return (
     <div className="grid gap-4">
       <ControlStudent student={student} />
@@ -18,4 +26,3 @@ export function ControlSection({ student, reader, user }: { student: StudentWith
     </div>
   );
 }
-

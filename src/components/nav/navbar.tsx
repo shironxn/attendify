@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 import {
@@ -21,10 +21,10 @@ import { usePathname } from "next/navigation";
 import { ToggleTheme } from "./theme-toggle";
 
 export function Navbar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
   return (
     <>
-      {pathname !== "/dashboard" &&
+      {pathname !== "/dashboard" && (
         <header>
           <nav className="flex justify-between p-5 items-center">
             <Link href={"/"} className="text-lg font-extrabold md:text-base">
@@ -33,7 +33,7 @@ export function Navbar() {
 
             <div className="flex items-center gap-2">
               <div>
-                <DropdownMenu >
+                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
@@ -83,6 +83,7 @@ export function Navbar() {
             </div>
           </nav>
         </header>
-      }</>
+      )}
+    </>
   );
 }

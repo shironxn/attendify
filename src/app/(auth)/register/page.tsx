@@ -5,7 +5,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import Link from "next/link";
 
 export default function Register() {
@@ -15,7 +15,8 @@ export default function Register() {
         <CardHeader>
           <CardTitle>Register</CardTitle>
           <CardDescription>
-            Daftar sekarang untuk membuat akun baru dan menikmati semua fitur kami.
+            Daftar sekarang untuk membuat akun baru dan menikmati semua fitur
+            kami.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -29,5 +30,5 @@ export default function Register() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

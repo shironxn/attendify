@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
 import { UserUpdateForm, UserUpdateSchema } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { User } from "@prisma/client";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -12,8 +12,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { updateUser } from "@/app/actions/user";
 import { toast } from "@/hooks/use-toast";
 import { useEffect } from "react";
@@ -22,14 +22,14 @@ const inputField = [
   {
     name: "name",
     label: "Name",
-    placeholder: "Masukkan nama anda"
+    placeholder: "Masukkan nama anda",
   },
   {
     name: "email",
     label: "Email",
-    placeholder: "Masukkan email anda"
+    placeholder: "Masukkan email anda",
   },
-]
+];
 
 export default function SettingSection({ user }: { user: User }) {
   const form = useForm<UserUpdateForm>({
@@ -37,9 +37,9 @@ export default function SettingSection({ user }: { user: User }) {
     defaultValues: {
       id: "",
       name: "",
-      email: ""
-    }
-  })
+      email: "",
+    },
+  });
 
   async function onSubmit(data: UserUpdateForm) {
     const res = await updateUser(data);
@@ -64,10 +64,10 @@ export default function SettingSection({ user }: { user: User }) {
       form.reset({
         id: String(user.id),
         name: user.name,
-        email: user.email
-      })
+        email: user.email,
+      });
     }
-  }, [user, form])
+  }, [user, form]);
 
   return (
     <Form {...form}>
@@ -91,5 +91,5 @@ export default function SettingSection({ user }: { user: User }) {
         <Button type="submit">Simpan</Button>
       </form>
     </Form>
-  )
+  );
 }

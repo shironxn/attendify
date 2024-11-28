@@ -7,11 +7,10 @@ import { BarChartComponent } from "./charts/bar";
 export type ChartData = {
   data: Array<{
     date: string;
-    data: Array<{ status: string, count: number }>
+    data: Array<{ status: string; count: number }>;
   }>;
   total: number;
 };
-
 
 export function StatsSection({ data }: { data: ChartData }) {
   return (
@@ -24,4 +23,3 @@ export function StatsSection({ data }: { data: ChartData }) {
     </div>
   );
 }
-

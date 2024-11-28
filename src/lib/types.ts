@@ -30,7 +30,7 @@ export const RegisterSchema = z.object({
     .regex(/\d/, "Password harus mengandung setidaknya satu angka")
     .regex(
       /[@$!%*?&#]/,
-      "Password harus mengandung setidaknya satu simbol khusus",
+      "Password harus mengandung setidaknya satu simbol khusus"
     ),
 });
 
@@ -44,7 +44,7 @@ export const StudentCreateSchema = z.object({
     .toUpperCase()
     .regex(
       /^(X|XI|XII)[1-8]$/,
-      "Kelas harus dimulai dengan X, XI, atau XII diikuti oleh angka 1-8 (contoh: X1, XI3, XII8)",
+      "Kelas harus dimulai dengan X, XI, atau XII diikuti oleh angka 1-8 (contoh: X1, XI3, XII8)"
     )
     .min(1, "Kelas tidak boleh kosong")
     .max(3, "Kelas maksimal 3 karakter"),
@@ -56,7 +56,7 @@ export const StudentCreateSchema = z.object({
     .string()
     .regex(
       /^62\d{8,13}$/,
-      "Nomor telepon harus dimulai dengan '62' dan memiliki panjang 10-15 digit",
+      "Nomor telepon harus dimulai dengan '62' dan memiliki panjang 10-15 digit"
     ),
   rfid: z
     .string()
@@ -77,7 +77,7 @@ export const StudentUpdateSchema = z.object({
     .string()
     .regex(
       /^(X|XI|XII)[1-8]$/,
-      "Kelas harus dimulai dengan X, XI, atau XII diikuti oleh angka 1-8 (contoh: X1, XI3, XII8)",
+      "Kelas harus dimulai dengan X, XI, atau XII diikuti oleh angka 1-8 (contoh: X1, XI3, XII8)"
     )
     .min(1, "Kelas tidak boleh kosong")
     .max(3, "Kelas maksimal 3 karakter")
@@ -91,7 +91,7 @@ export const StudentUpdateSchema = z.object({
     .string()
     .regex(
       /^62\d{8,13}$/,
-      "Nomor telepon harus dimulai dengan '62' dan memiliki panjang 10-15 digit",
+      "Nomor telepon harus dimulai dengan '62' dan memiliki panjang 10-15 digit"
     )
     .optional(),
   rfid: z

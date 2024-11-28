@@ -1,33 +1,32 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   BotIcon,
   ChartLineIcon,
   IdCardIcon,
   Settings2Icon,
   SquareTerminalIcon,
-} from "lucide-react"
+} from "lucide-react";
 
-import { NavMain } from "@/components/dashboard/nav-main"
-import { NavUser } from "@/components/dashboard/nav-user"
-import { SidebarMenuButton } from "@/components/ui/sidebar"
+import { NavMain } from "@/components/dashboard/nav-main";
+import { NavUser } from "@/components/dashboard/nav-user";
+import { SidebarMenuButton } from "@/components/ui/sidebar";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import { User } from "@prisma/client"
+} from "@/components/ui/sidebar";
+import { User } from "@prisma/client";
 
 const data = {
   user: {
     name: "",
     email: "",
   },
-  header:
-  {
+  header: {
     name: "Attendify",
     logo: IdCardIcon,
     plan: "shironism",
@@ -55,14 +54,16 @@ const data = {
       icon: Settings2Icon,
     },
   ],
-}
+};
 
-export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sidebar> & { user: User }) {
+export function AppSidebar({
+  user,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { user: User }) {
   data.user = {
     name: user.name,
     email: user.email,
-  }
-
+  };
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -75,9 +76,7 @@ export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sideb
             <data.header.logo className="size-4" />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">
-              {data.header.name}
-            </span>
+            <span className="truncate font-semibold">{data.header.name}</span>
             <span className="truncate text-xs">{data.header.plan}</span>
           </div>
         </SidebarMenuButton>
@@ -90,5 +89,5 @@ export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sideb
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

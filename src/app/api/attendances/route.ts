@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     if (!card || !card.student) {
       return Response.json(
         { message: `Kartu dengan ID: ${res.rfid} tidak terdaftar di sistem.` },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -34,10 +34,10 @@ export async function POST(request: Request) {
     });
 
     const hasCheckedIn = todaysAttendance.some(
-      (item) => item.status !== "PULANG",
+      (item) => item.status !== "PULANG"
     );
     const hasCheckedOut = todaysAttendance.some(
-      (item) => item.status === "PULANG",
+      (item) => item.status === "PULANG"
     );
 
     if (now.isSameOrAfter(exitTime)) {
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
               status,
             },
           },
-          { status: 409 },
+          { status: 409 }
         );
       }
       if (!hasCheckedIn) {
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
               status,
             },
           },
-          { status: 400 },
+          { status: 400 }
         );
       }
     } else {
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
               status,
             },
           },
-          { status: 409 },
+          { status: 409 }
         );
       }
     }
@@ -100,13 +100,27 @@ export async function POST(request: Request) {
     let message;
     switch (status) {
       case "HADIR":
-        message = `Anak Anda, ${attendance.student.name}, telah sampai di SMAN 48 Jakarta dengan selamat pada ${djs(attendance.createdAt).format("LLL")}. Terima kasih.`;
+        message = `Anak Anda, ${
+          attendance.student.name
+        }, telah sampai di SMAN 48 Jakarta dengan selamat pada ${djs(
+          attendance.createdAt
+        ).format("LLL")}. Terima kasih.`;
         break;
       case "TELAT":
-        message = `Anak Anda, ${attendance.student.name}, terlambat datang ke SMAN 48 Jakarta pada ${djs(attendance.createdAt).format("LLL")}. Mohon konfirmasi alasan keterlambatan kepada wali kelas atau pihak sekolah. Terima kasih.`;
+        message = `Anak Anda, ${
+          attendance.student.name
+        }, terlambat datang ke SMAN 48 Jakarta pada ${djs(
+          attendance.createdAt
+        ).format(
+          "LLL"
+        )}. Mohon konfirmasi alasan keterlambatan kepada wali kelas atau pihak sekolah. Terima kasih.`;
         break;
       case "PULANG":
-        message = `Anak Anda, ${attendance.student.name}, telah meninggalkan SMAN 48 Jakarta dengan selamat pada ${djs(attendance.createdAt).format("LLL")}. Terima kasih.`;
+        message = `Anak Anda, ${
+          attendance.student.name
+        }, telah meninggalkan SMAN 48 Jakarta dengan selamat pada ${djs(
+          attendance.createdAt
+        ).format("LLL")}. Terima kasih.`;
         break;
     }
 
@@ -123,13 +137,15 @@ export async function POST(request: Request) {
 
     return Response.json(
       {
-        message: `Presensi berhasil tercatat untuk ${attendance.student.name} dengan status ${status.toLowerCase()}.`,
+        message: `Presensi berhasil tercatat untuk ${
+          attendance.student.name
+        } dengan status ${status.toLowerCase()}.`,
         data: {
           name: attendance.student.name,
           status,
         },
       },
-      { status: 201 },
+      { status: 201 }
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -137,7 +153,7 @@ export async function POST(request: Request) {
     }
     return Response.json(
       { message: "Terjadi kesalahan pada server. Silakan coba lagi nanti." },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

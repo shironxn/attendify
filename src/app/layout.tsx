@@ -6,7 +6,6 @@ import { ThemeProvider } from "@/hooks/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import AOSComponent from "@/hooks/aos";
 
-
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -20,7 +19,8 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Attendify",
-  description: "Lacak kehadiran dengan mudah hanya dengan satu ketukan menggunakan teknologi RFID kami.",
+  description:
+    "Lacak kehadiran dengan mudah hanya dengan satu ketukan menggunakan teknologi RFID kami.",
 };
 
 export default function RootLayout({
@@ -36,16 +36,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-        >
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AOSComponent>
             <Navbar />
-            <main>
-              {children}
-            </main>
+            <main>{children}</main>
             <Toaster />
           </AOSComponent>
         </ThemeProvider>

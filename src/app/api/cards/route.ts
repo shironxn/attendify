@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 
     return Response.json(
       { message: "Berhasil menambahkan kartu.", data: res },
-      { status: 201 },
+      { status: 201 }
     );
   } catch (error) {
     return Response.json(error, { status: 500 });

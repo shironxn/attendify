@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/dashboard/app-sidebar"
+import { AppSidebar } from "@/components/dashboard/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,72 +6,78 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { getAuth } from "../actions/auth"
-import { MonitorSection } from "@/components/dashboard/sections/monitor"
+} from "@/components/ui/sidebar";
+import { getAuth } from "../actions/auth";
+import { MonitorSection } from "@/components/dashboard/sections/monitor";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { BotIcon, ChartLineIcon, Settings2Icon, SquareTerminalIcon } from "lucide-react"
-import Link from "next/link"
-import { getAttendance, getAttendanceCount } from "../actions/attendance"
-import { StatsSection } from "@/components/dashboard/sections/stats"
-import { getStudent } from "../actions/student"
-import { ControlSection } from "@/components/dashboard/sections/control"
-import { getReader } from "../actions/reader"
-import { redirect } from "next/navigation"
-import SettingSection from "@/components/dashboard/sections/setting"
+} from "@/components/ui/card";
+import {
+  BotIcon,
+  ChartLineIcon,
+  Settings2Icon,
+  SquareTerminalIcon,
+} from "lucide-react";
+import Link from "next/link";
+import { getAttendance, getAttendanceCount } from "../actions/attendance";
+import { StatsSection } from "@/components/dashboard/sections/stats";
+import { getStudent } from "../actions/student";
+import { ControlSection } from "@/components/dashboard/sections/control";
+import { getReader } from "../actions/reader";
+import { redirect } from "next/navigation";
+import SettingSection from "@/components/dashboard/sections/setting";
 
 const navList = [
   {
     title: "Monitor",
     description: "Lihat aktivitas real-time.",
     icon: <SquareTerminalIcon />,
-    url: "monitor"
+    url: "monitor",
   },
   {
     title: "Stats",
     description: "Analisis data kehadiran.",
     icon: <ChartLineIcon />,
-    url: "stats"
+    url: "stats",
   },
   {
     title: "Control",
     description: "Kelola perangkat dengan mudah.",
     icon: <BotIcon />,
-    url: "control"
+    url: "control",
   },
   {
     title: "Setting",
     description: "Sesuaikan pengaturan sistem.",
     icon: <Settings2Icon />,
-    url: "setting"
-  }
-]
+    url: "setting",
+  },
+];
 
+export default async function Dashboard(props: {
+  searchParams?: Promise<{ section?: string }>;
+}) {
+  const searchParams = await props.searchParams;
+  const section = searchParams?.section;
 
-export default async function Dashboard(props: { searchParams?: Promise<{ section?: string }> }) {
-  const searchParams = await props.searchParams
-  const section = searchParams?.section
-
-  const user = await getAuth()
-  const attendance = await getAttendance()
-  const chart = await getAttendanceCount()
-  const student = await getStudent()
-  const reader = await getReader()
+  const user = await getAuth();
+  const attendance = await getAttendance();
+  const chart = await getAttendanceCount();
+  const student = await getStudent();
+  const reader = await getReader();
 
   if (!user.data) {
-    redirect("/")
+    redirect("/");
   }
 
   return (
@@ -85,51 +91,56 @@ export default async function Dashboard(props: { searchParams?: Promise<{ sectio
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/dashboard">
-                    Dashboard
-                  </BreadcrumbLink>
+                  <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
                 </BreadcrumbItem>
-                {section &&
+                {section && (
                   <>
                     <BreadcrumbSeparator className="hidden md:block" />
                     <BreadcrumbItem>
-                      <BreadcrumbPage>{section.charAt(0).toUpperCase() + section.slice(1)}</BreadcrumbPage>
+                      <BreadcrumbPage>
+                        {section.charAt(0).toUpperCase() + section.slice(1)}
+                      </BreadcrumbPage>
                     </BreadcrumbItem>
-                  </>}
+                  </>
+                )}
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          {!section &&
+          {!section && (
             <div className="flex flex-col items-center justify-center space-y-8 mt-24">
               <div className="text-center">
                 <h1>Selamat datang {user.data?.name}!</h1>
                 <p>Pantau terus kehadiran dengan berbagai fitur Attendify.</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg">
-                {
-                  navList.map((item, index) => (
-                    <Link href={`?section=${item.url}`} key={index}>
-                      <Card className="hover:scale-105 hover:shadow-xl transition-transform">
-                        <CardHeader>
-                          <CardTitle>{item.title}</CardTitle>
-                          <CardDescription>{item.description}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          {item.icon}
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  ))}
+                {navList.map((item, index) => (
+                  <Link href={`?section=${item.url}`} key={index}>
+                    <Card className="hover:scale-105 hover:shadow-xl transition-transform">
+                      <CardHeader>
+                        <CardTitle>{item.title}</CardTitle>
+                        <CardDescription>{item.description}</CardDescription>
+                      </CardHeader>
+                      <CardContent>{item.icon}</CardContent>
+                    </Card>
+                  </Link>
+                ))}
               </div>
-            </div>}
+            </div>
+          )}
           {section === "monitor" && <MonitorSection attendance={attendance} />}
           {section === "stats" && <StatsSection data={chart} />}
-          {section === "control" && <ControlSection student={student} reader={reader} user={user.data} />}
+          {section === "control" && (
+            <ControlSection
+              student={student}
+              reader={reader}
+              user={user.data}
+            />
+          )}
           {section === "setting" && <SettingSection user={user.data} />}
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

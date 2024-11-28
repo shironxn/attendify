@@ -1,21 +1,17 @@
-"use client"
+"use client";
 
-import Link from "next/link"
+import Link from "next/link";
 import {
   ChevronsUpDown,
   GithubIcon,
   HomeIcon,
   InfoIcon,
   LogOut,
-  LucideIcon,
   UserRoundIcon,
   UserRoundSearchIcon,
-} from "lucide-react"
+} from "lucide-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,25 +20,25 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { logout } from "@/app/actions/auth"
-import { ToggleTheme } from "../nav/theme-toggle"
+} from "@/components/ui/sidebar";
+import { logout } from "@/app/actions/auth";
+import { ToggleTheme } from "../nav/theme-toggle";
 
 export function NavUser({
   user,
 }: {
   user: {
-    name: string
-    email: string
-  }
+    name: string;
+    email: string;
+  };
 }) {
-  const { isMobile } = useSidebar()
+  const { isMobile } = useSidebar();
 
   return (
     <SidebarMenu>
@@ -124,5 +120,5 @@ export function NavUser({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

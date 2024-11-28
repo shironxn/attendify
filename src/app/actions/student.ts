@@ -56,7 +56,7 @@ export async function getStudent() {
     }
 
     throw new Error(
-      "An unexpected error occurred while fetching student data.",
+      "An unexpected error occurred while fetching student data."
     );
   }
 }
@@ -119,7 +119,6 @@ export async function updateStudent(data: StudentUpdateForm) {
       });
     }
   } catch (error) {
-
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       switch (error.code) {
         case "P2025":

@@ -20,7 +20,7 @@ export async function getAttendance() {
     }
 
     throw new Error(
-      "An unexpected error occurred while fetching attendance data.",
+      "An unexpected error occurred while fetching attendance data."
     );
   }
 }
@@ -51,10 +51,10 @@ export async function createAttendance(data: AttendanceCraeteForm) {
     });
 
     const hasCheckedIn = todaysAttendance.some(
-      (item) => item.status !== "PULANG",
+      (item) => item.status !== "PULANG"
     );
     const hasCheckedOut = todaysAttendance.some(
-      (item) => item.status === "PULANG",
+      (item) => item.status === "PULANG"
     );
 
     if (now.isSameOrAfter(exitTime)) {
@@ -67,7 +67,7 @@ export async function createAttendance(data: AttendanceCraeteForm) {
               status: data.status,
             },
           },
-          { status: 409 },
+          { status: 409 }
         );
       }
     } else {
@@ -80,7 +80,7 @@ export async function createAttendance(data: AttendanceCraeteForm) {
               status: data.status,
             },
           },
-          { status: 409 },
+          { status: 409 }
         );
       }
     }
@@ -96,13 +96,27 @@ export async function createAttendance(data: AttendanceCraeteForm) {
     let message;
     switch (data.status) {
       case "HADIR":
-        message = `Anak Anda, ${student.name}, telah sampai di SMAN 48 Jakarta dengan selamat pada ${djs(attendance.createdAt).format("LLL")}. Terima kasih.`;
+        message = `Anak Anda, ${
+          student.name
+        }, telah sampai di SMAN 48 Jakarta dengan selamat pada ${djs(
+          attendance.createdAt
+        ).format("LLL")}. Terima kasih.`;
         break;
       case "TELAT":
-        message = `Anak Anda, ${student.name}, terlambat datang ke SMAN 48 Jakarta pada ${djs(attendance.createdAt).format("LLL")}. Mohon konfirmasi alasan keterlambatan kepada wali kelas atau pihak sekolah. Terima kasih.`;
+        message = `Anak Anda, ${
+          student.name
+        }, terlambat datang ke SMAN 48 Jakarta pada ${djs(
+          attendance.createdAt
+        ).format(
+          "LLL"
+        )}. Mohon konfirmasi alasan keterlambatan kepada wali kelas atau pihak sekolah. Terima kasih.`;
         break;
       case "PULANG":
-        message = `Anak Anda, ${student.name}, telah meninggalkan SMAN 48 Jakarta dengan selamat pada ${djs(attendance.createdAt).format("LLL")}. Terima kasih.`;
+        message = `Anak Anda, ${
+          student.name
+        }, telah meninggalkan SMAN 48 Jakarta dengan selamat pada ${djs(
+          attendance.createdAt
+        ).format("LLL")}. Terima kasih.`;
         break;
     }
 
@@ -215,13 +229,17 @@ export async function getAttendanceCount() {
           }
           return acc;
         },
-        [],
+        []
       );
 
       return { date, data: statusCounts };
     });
 
-    return { data: result, total: data.length };
+    const totalData = data.reduce((acc, curr) => {
+      return acc + curr._count.id;
+    }, 0);
+
+    return { data: result, total: totalData };
   } catch (error) {
     console.error("Unexpected error in getAttendance:", error);
 
@@ -230,7 +248,7 @@ export async function getAttendanceCount() {
     }
 
     throw new Error(
-      "An unexpected error occurred while fetching attendance data.",
+      "An unexpected error occurred while fetching attendance data."
     );
   }
 }

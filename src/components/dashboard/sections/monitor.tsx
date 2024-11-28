@@ -56,7 +56,7 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet"
+} from "@/components/ui/sheet";
 import {
   Dialog,
   DialogClose,
@@ -95,9 +95,14 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import { CaretSortIcon } from "@radix-ui/react-icons";
-import { AttendanceCraeteForm, AttendanceCreateSchema, AttendanceUpdateForm, AttendanceUpdateSchema } from "@/lib/types";
+import {
+  AttendanceCraeteForm,
+  AttendanceCreateSchema,
+  AttendanceUpdateForm,
+  AttendanceUpdateSchema,
+} from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 type AttendanceWithStudent = Prisma.AttendanceGetPayload<{
@@ -137,7 +142,11 @@ const statusList: Status[] = [
   "PULANG",
 ];
 
-export function MonitorSection({ attendance }: { attendance: AttendanceWithStudent[] }) {
+export function MonitorSection({
+  attendance,
+}: {
+  attendance: AttendanceWithStudent[];
+}) {
   const [data, setData] = useState<AttendanceWithStudent[]>(attendance);
   const [filteredData, setFilteredData] = useState<
     AttendanceWithStudent[] | undefined
@@ -157,7 +166,6 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
   const [openEdit, setOpenEdit] = useState<AttendanceWithStudent | null>(null);
   const [openDelete, setOpenDelete] = useState<number | null>(null);
 
-
   const formAdd = useForm<AttendanceCraeteForm>({
     resolver: zodResolver(AttendanceCreateSchema),
     defaultValues: {
@@ -174,7 +182,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
       status: "",
       description: "",
     },
-  })
+  });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -183,44 +191,56 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
         setFilteredData(data);
 
         cards.forEach((item) => (item.content = 0));
-        data
-          .filter((item) => djs().isSame(item.createdAt, "day"))
-          .forEach((item) => {
-            switch (item.status) {
-              case "HADIR":
-                cards[0].content += 1;
-                break;
-              case "TELAT":
-                cards[1].content += 1;
-                break;
-              case "IZIN":
-                cards[2].content += 1;
-                break;
-              case "DISPEN":
-                cards[0].content += 1;
-                break;
-              case "SAKIT":
-                cards[2].content += 1;
-                break;
-              case "ALFA":
-                cards[2].content += 1;
-                break;
-              case "PULANG":
-                cards[3].content += 1;
-                break;
-              default:
-                break;
-            }
-          });
+
+        const filtered = data
+          .filter((item) =>
+            time === "TODAY" ? djs().isSame(item.createdAt, "day") : true
+          )
+          .filter((item) =>
+            status !== "SEMUA" ? item.status === status : true
+          )
+          .filter((item) =>
+            search
+              ? item.student.name.toLowerCase().includes(search.toLowerCase())
+              : true
+          );
+
+        filtered.forEach((item) => {
+          switch (item.status) {
+            case "HADIR":
+              cards[0].content += 1;
+              break;
+            case "TELAT":
+              cards[1].content += 1;
+              break;
+            case "IZIN":
+              cards[2].content += 1;
+              break;
+            case "DISPEN":
+              cards[0].content += 1;
+              break;
+            case "SAKIT":
+              cards[2].content += 1;
+              break;
+            case "ALFA":
+              cards[2].content += 1;
+              break;
+            case "PULANG":
+              cards[3].content += 1;
+              break;
+            default:
+              break;
+          }
+        });
       });
     }, 1000);
 
     if (attendance) {
-      setData(attendance)
+      setData(attendance);
     }
 
     return () => clearInterval(interval);
-  }, [attendance]);
+  }, [attendance, search, time, status]);
 
   useEffect(() => {
     const start = (page - 1) * sizePage;
@@ -237,26 +257,31 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
           time === "TODAY" ? djs().isSame(item.createdAt, "day") : true
         )
         .filter((item) => (status !== "SEMUA" ? item.status === status : true))
-        .filter((item => kelas ? item.student.class === kelas : true));
+        .filter((item) => (kelas ? item.student.class === kelas : true));
 
       setFilteredData(filteredData.slice(start, end));
       setTotalPage(Math.ceil(filteredData.length / sizePage));
     }
-  }, [data, search, kelas, time, status, page, sizePage, totalPage]);
+  }, [data, search, kelas, time, status, page, sizePage]);
 
   useEffect(() => {
     if (openEdit) {
       formEdit.reset({
         id: String(openEdit.id),
         status: openEdit.status,
-        description: String(openEdit.description)
-      })
+        description: String(openEdit.description),
+      });
     }
-  }, [openEdit, formEdit])
+  }, [openEdit, formEdit]);
 
-
-  async function onSubmit(data: AttendanceCraeteForm | AttendanceUpdateForm, type: "tambah" | "update") {
-    const res = type === "tambah" ? await createAttendance(data as AttendanceCraeteForm) : await updateAttendance(data as AttendanceUpdateForm)
+  async function onSubmit(
+    data: AttendanceCraeteForm | AttendanceUpdateForm,
+    type: "tambah" | "update"
+  ) {
+    const res =
+      type === "tambah"
+        ? await createAttendance(data as AttendanceCraeteForm)
+        : await updateAttendance(data as AttendanceUpdateForm);
 
     if (typeof res === "object" && "error" in res && res.error) {
       toast({
@@ -275,26 +300,25 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
 
     toast({
       title: "Sukses",
-      description: `Berhasil ${type} presensi`
-    })
-
+      description: `Berhasil ${type} presensi`,
+    });
   }
 
   async function onDelete(id: number) {
-    const res = await deleteAttendance(id)
+    const res = await deleteAttendance(id);
 
     if (res?.error) {
       toast({
         title: "Error",
-        description: res.error
-      })
-      return
+        description: res.error,
+      });
+      return;
     }
 
     toast({
       title: "Sukses",
-      description: "Berhasil menghapus presensi"
-    })
+      description: "Berhasil menghapus presensi",
+    });
   }
 
   return (
@@ -322,18 +346,22 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
             onChange={(e) => setSearch(e.target.value)}
           />
           <div>
-            <Button size={"icon"} onClick={() => setOpenAdd(true)}><PlusCircleIcon /></Button>
+            <Button size={"icon"} onClick={() => setOpenAdd(true)}>
+              <PlusCircleIcon />
+            </Button>
           </div>
         </div>
 
         <div className="col-span-2 md:col-span-1 md:col-start-4">
           <DropdownMenu>
             <DropdownMenuTrigger className="flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1">
-              {kelas ? kelas : "Kelas"}<CaretSortIcon className="h-4 w-4 opacity-50" />
+              {kelas ? kelas : "Kelas"}
+              <CaretSortIcon className="h-4 w-4 opacity-50" />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               {[...Array(3)].map((_, indexClass) => {
-                const className = indexClass === 0 ? "X" : indexClass === 1 ? "XI" : "XII";
+                const className =
+                  indexClass === 0 ? "X" : indexClass === 1 ? "XI" : "XII";
                 return (
                   <DropdownMenuSub key={indexClass}>
                     <DropdownMenuSubTrigger>
@@ -344,7 +372,9 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
                         {[...Array(8)].map((_, index) => (
                           <DropdownMenuItem
                             key={index}
-                            onClick={() => setKelas(`${className}${index + 1}` as Class)}
+                            onClick={() =>
+                              setKelas(`${className}${index + 1}` as Class)
+                            }
                           >
                             <span>{index + 1}</span>
                           </DropdownMenuItem>
@@ -499,7 +529,12 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
             <DialogTitle>Menambahkan Kehadiran</DialogTitle>
           </DialogHeader>
           <Form {...formAdd}>
-            <form onSubmit={formAdd.handleSubmit(data => onSubmit(data, "tambah"))} className="space-y-4">
+            <form
+              onSubmit={formAdd.handleSubmit((data) =>
+                onSubmit(data, "tambah")
+              )}
+              className="space-y-4"
+            >
               <FormField
                 control={formAdd.control}
                 name="nis"
@@ -510,7 +545,9 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
                       <Input
                         placeholder="Masukkan nis siswa (5 digit)"
                         value={field.value || ""}
-                        onChange={e => formAdd.setValue("nis", e.target.value)}
+                        onChange={(e) =>
+                          formAdd.setValue("nis", e.target.value)
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -523,7 +560,10 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Pilih status siswa" />
@@ -556,7 +596,9 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
                       <Input
                         placeholder="Contoh: Siswa hadir, sakit, atau izin"
                         value={field.value || ""}
-                        onChange={e => formAdd.setValue("description", e.target.value)}
+                        onChange={(e) =>
+                          formAdd.setValue("description", e.target.value)
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -641,9 +683,7 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
                 <Label className="text-muted-foreground">Waktu</Label>
                 <Input
                   id="created_at"
-                  defaultValue={djs(openView?.createdAt).format(
-                    "LLL"
-                  )}
+                  defaultValue={djs(openView?.createdAt).format("LLL")}
                   readOnly
                   className="col-span-3 bg-muted"
                 />
@@ -689,21 +729,27 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
       <Sheet open={openEdit !== null} onOpenChange={() => setOpenEdit(null)}>
         <SheetContent className="w-[400px] sm:w-[540px]">
           <SheetHeader>
-            <SheetTitle>{openEdit?.student.name} #{openEdit?.id}</SheetTitle>
+            <SheetTitle>
+              {openEdit?.student.name} #{openEdit?.id}
+            </SheetTitle>
             <SheetDescription>
-              Cek lagi datanya sebelum disimpan, pastikan semuanya sudah sesuai karena perubahan ini bersifat permanen.
+              Cek lagi datanya sebelum disimpan, pastikan semuanya sudah sesuai
+              karena perubahan ini bersifat permanen.
             </SheetDescription>
           </SheetHeader>
           <Form {...formEdit}>
-            <form onSubmit={formEdit.handleSubmit(data => onSubmit(data, "update"))} className="space-y-4 mt-8">
+            <form
+              onSubmit={formEdit.handleSubmit((data) =>
+                onSubmit(data, "update")
+              )}
+              className="space-y-4 mt-8"
+            >
               <FormField
                 control={formEdit.control}
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      Status
-                    </FormLabel>
+                    <FormLabel>Status</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={openEdit?.status}
@@ -739,7 +785,9 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
                     <FormControl>
                       <Input
                         value={field.value || openEdit?.description || ""}
-                        onChange={e => formEdit.setValue("description", e.target.value)}
+                        onChange={(e) =>
+                          formEdit.setValue("description", e.target.value)
+                        }
                       />
                     </FormControl>
                   </FormItem>
@@ -763,7 +811,8 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus Data Kehadiran</AlertDialogTitle>
             <AlertDialogDescription>
-              Apakah anda yakin ingin menghapus data ini? Tindakan ini bersifat permanen dan tidak dapat dibatalkan.
+              Apakah anda yakin ingin menghapus data ini? Tindakan ini bersifat
+              permanen dan tidak dapat dibatalkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -777,6 +826,6 @@ export function MonitorSection({ attendance }: { attendance: AttendanceWithStude
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div >
+    </div>
   );
 }

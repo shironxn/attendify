@@ -37,21 +37,29 @@ export function BarChartComponent({ data }: { data: ChartData }) {
   const [activeChart, setActiveChart] =
     React.useState<keyof typeof chartConfig>("hadir")
 
-  const chartData = data.data.map((item) => {
-    if (djs().isSameOrBefore(item.date, "week")) {
-      return {
-        date: item.date,
-        hadir: item.data.reduce(
-          (acc, curr) =>
-            ["hadir", "telat", "dispen"].includes(curr.status) ? acc + curr.count : acc,
-          0
-        ),
-        tidakHadir: item.data.reduce(
-          (acc, curr) =>
-            ["izin", "sakit", "alfa"].includes(curr.status) ? acc + curr.count : acc,
-          0
-        ),
-      }
+  const daysOfWeek = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"]
+
+  const chartData = daysOfWeek.map((day, index) => {
+    const matchingData = data.data.find((item) =>
+      djs(item.date).day() === index + 1 
+    )
+
+    return {
+      date: day,
+      hadir: matchingData
+        ? matchingData.data.reduce(
+            (acc, curr) =>
+              ["hadir", "telat", "dispen"].includes(curr.status) ? acc + curr.count : acc,
+            0
+          )
+        : 0,
+      tidakHadir: matchingData
+        ? matchingData.data.reduce(
+            (acc, curr) =>
+              ["izin", "sakit", "alfa"].includes(curr.status) ? acc + curr.count : acc,
+            0
+          )
+        : 0,
     }
   })
 
@@ -65,7 +73,7 @@ export function BarChartComponent({ data }: { data: ChartData }) {
         { hadir: 0, tidakHadir: 0 }
       ),
     [chartData]
-  );
+  )
 
   return (
     <Card>
@@ -117,26 +125,13 @@ export function BarChartComponent({ data }: { data: ChartData }) {
               axisLine={false}
               tickMargin={8}
               minTickGap={32}
-              tickFormatter={(value) => {
-                const date = new Date(value)
-                return date.toLocaleDateString("id", {
-                  weekday: "short"
-                })
-              }}
-
             />
             <ChartTooltip
               content={
                 <ChartTooltipContent
                   className="w-[150px]"
                   nameKey="views"
-                  labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("id", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })
-                  }}
+                  labelFormatter={(value) => value}
                 />
               }
             />
@@ -147,4 +142,3 @@ export function BarChartComponent({ data }: { data: ChartData }) {
     </Card>
   )
 }
-

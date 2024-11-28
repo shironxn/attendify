@@ -5,5 +5,5 @@ export default function CariSiswa() {
     <div className="container max-w-2xl space-y-8 pt-20">
       <CariSiswaForm />
     </div>
-  )
+  );
 }

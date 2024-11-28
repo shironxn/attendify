@@ -75,7 +75,6 @@ export async function login(data: Login) {
       httpOnly: true,
       sameSite: "strict",
     });
-    
   } catch (error) {
     console.error("Error during login:", error);
     return {

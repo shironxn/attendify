@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ReloadIcon } from "@radix-ui/react-icons";
@@ -21,7 +16,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -36,8 +31,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
-
+} from "@/components/ui/tooltip";
 
 type StudentWithAttendance = Prisma.StudentGetPayload<{
   include: { attendances: true };
@@ -47,14 +41,15 @@ export function CariSiswaForm() {
   const [isLoading, startTransition] = useTransition();
   const { toast } = useToast();
 
-  const [students, setStudents] = useState<StudentWithAttendance[] | null>(null);
+  const [students, setStudents] = useState<StudentWithAttendance[] | null>(
+    null
+  );
   const [openView, setOpenView] = useState<StudentWithAttendance | null>(null);
-
 
   const form = useForm<{ search: string }>({
     defaultValues: {
       search: "",
-    }
+    },
   });
 
   async function onSubmit(data: { search: string }) {
@@ -78,14 +73,21 @@ export function CariSiswaForm() {
   return (
     <div className="space-y-8">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-center gap-2">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex items-center gap-2"
+        >
           <FormField
             control={form.control}
             name="search"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input placeholder="Masukkan nama siswa" {...field} required />
+                  <Input
+                    placeholder="Masukkan nama siswa"
+                    {...field}
+                    required
+                  />
                 </FormControl>
               </FormItem>
             )}
@@ -95,7 +97,6 @@ export function CariSiswaForm() {
               <ReloadIcon className="animate-spin" />
             ) : (
               <SearchIcon />
-
             )}
           </Button>
         </form>
@@ -119,7 +120,19 @@ export function CariSiswaForm() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button size="icon" variant="outline" onClick={() => item.attendances.length !== 0 ? setOpenView(item) : toast({ title: "Error", description: "Belum ada data kehadiran", variant: "destructive" })}>
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() =>
+                          item.attendances.length !== 0
+                            ? setOpenView(item)
+                            : toast({
+                                title: "Error",
+                                description: "Belum ada data kehadiran",
+                                variant: "destructive",
+                              })
+                        }
+                      >
                         <EyeIcon />
                       </Button>
                     </TooltipTrigger>
@@ -173,9 +186,7 @@ export function CariSiswaForm() {
               <Label className="text-muted-foreground">Waktu</Label>
               <Input
                 id="created_at"
-                defaultValue={djs(openView?.createdAt).format(
-                  "LLL"
-                )}
+                defaultValue={djs(openView?.createdAt).format("LLL")}
                 readOnly
                 className="col-span-3 bg-muted"
               />
@@ -186,4 +197,3 @@ export function CariSiswaForm() {
     </div>
   );
 }
-
