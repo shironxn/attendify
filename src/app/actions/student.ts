@@ -119,7 +119,6 @@ export async function updateStudent(data: StudentUpdateForm) {
       });
     }
   } catch (error) {
-    console.error("Error updating student:", error);
 
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       switch (error.code) {
