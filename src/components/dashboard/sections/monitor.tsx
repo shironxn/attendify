@@ -540,7 +540,7 @@ export function MonitorSection({
                 name="nis"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>nis</FormLabel>
+                    <FormLabel>NIS</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Masukkan nis siswa (5 digit)"
