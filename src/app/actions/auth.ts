@@ -75,14 +75,15 @@ export async function login(data: Login) {
       httpOnly: true,
       sameSite: "strict",
     });
-
-    redirect("/dashboard");
+    
   } catch (error) {
     console.error("Error during login:", error);
     return {
       error: "An unexpected error occurred during login",
     };
   }
+
+  redirect("/dashboard");
 }
 
 export async function register(data: Register) {
