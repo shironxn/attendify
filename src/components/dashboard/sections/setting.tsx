@@ -21,7 +21,7 @@ import { useEffect } from "react";
 const inputField = [
   {
     name: "name",
-    label: "Name",
+    label: "Nama",
     placeholder: "Masukkan nama anda",
   },
   {

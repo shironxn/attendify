@@ -117,7 +117,7 @@ export default async function Dashboard(props: {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg">
                 {navList.map((item, index) => (
                   <Link href={`?section=${item.url}`} key={index}>
-                    <Card className="hover:scale-105 hover:shadow-xl transition-transform">
+                    <Card className="hover:scale-105 hover:shadow-xl transition-transform h-40 w-64">
                       <CardHeader>
                         <CardTitle>{item.title}</CardTitle>
                         <CardDescription>{item.description}</CardDescription>
